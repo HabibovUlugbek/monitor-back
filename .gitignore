@@ -1,0 +1,14 @@
+.idea/
+.vscode/
+
+dist/
+docs/
+coverage/
+node_modules/
+
+**/*.db
+**/*.log
+
+**/.env
+**/.npmrc
+**/.DS_Store

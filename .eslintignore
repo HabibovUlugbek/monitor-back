@@ -1,0 +1,9 @@
+.git/
+.idea/
+.vscode/
+
+/dist
+/docs
+/prisma
+/coverage
+/node_modules

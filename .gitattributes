@@ -1,0 +1,18 @@
+* text=auto
+
+**/*.md export-ignore
+**/*.yml export-ignore
+**/*.yaml export-ignore
+**/*.json export-ignore
+**/*.lock export-ignore
+
+**/.eslintrc export-ignore
+**/.prettierrc export-ignore
+
+**/.gitignore export-ignore
+**/.dockerignore export-ignore
+**/.eslintignore export-ignore
+**/.prettierignore export-ignore
+
+**/.editorconfig export-ignore
+**/.gitattributes export-ignore
