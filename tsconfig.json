@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "CommonJS",
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "moduleResolution": "Node",
+    "lib": [
+      "ESNext"
+    ],
+        "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@config": [
+        "./config"
+      ],
+      "@module": [
+        "./module"
+      ],
+      "@helper": [
+        "./helper"
+      ],
+      "@interface": [
+        "./interface"
+      ],
+    },
+     "strict": true,
+    "skipLibCheck": true,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "exclude": [
+    "**/*.int-spec.ts",
+    "**/*.e2e-spec.ts"
+  ]
+}
