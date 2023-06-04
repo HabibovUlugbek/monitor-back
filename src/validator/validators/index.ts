@@ -1,0 +1,6 @@
+export * from './is-date.validator'
+export * from './is-phone.validator'
+export * from './is-number.validator'
+export * from './is-integer.validator'
+export * from './is-number-string.validator'
+export * from './is-integer-string.validator'

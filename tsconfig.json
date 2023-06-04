@@ -12,17 +12,23 @@
       "@/*": [
         "./*"
       ],
-      "@config": [
-        "./config"
+      "@configs": [
+        "./configs"
       ],
-      "@module": [
-        "./module"
+      "@logger": [
+        "./logger"
+      ],
+      "@modules": [
+        "./modules"
       ],
       "@helper": [
         "./helper"
       ],
-      "@interface": [
-        "./interface"
+      "@interfaces": [
+        "./interfaces"
+      ],
+      "@exceptions": [
+        "./exceptions"
       ],
     },
      "strict": true,

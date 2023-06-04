@@ -1,4 +1,4 @@
-import { HttpStatus, HttpMessage } from '@exceptions'
+import { HttpStatus, HttpMessage } from '../enums'
 
 export const httpMessage: Record<number, string> = {
   [HttpStatus.CONTINUE]: HttpMessage.CONTINUE,

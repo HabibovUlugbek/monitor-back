@@ -1,0 +1,6 @@
+export * from './is-date.decorator'
+export * from './is-phone.decorator'
+export * from './is-number.decorator'
+export * from './is-integer.decorator'
+export * from './is-number-string.decorator'
+export * from './is-integer-string.decorator'
