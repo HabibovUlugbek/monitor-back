@@ -6,7 +6,7 @@ import { httpMessage } from '../helpers'
 import { Exception } from '../exceptions'
 
 @Catch()
-export class ExpressExceptionFilter implements ExceptionFilter {
+export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): Response {
     const express = host.switchToHttp()
     const response = express.getResponse<Response>()

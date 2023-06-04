@@ -1,10 +1,30 @@
+import type { PrismaServiceOptions } from '@modules'
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import { PrismaModule } from '@modules'
+import { databaseConfig } from '@configs'
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    ConfigModule.forRoot({
+      load: [databaseConfig],
+      cache: true,
+      isGlobal: true,
+    }),
+    PrismaModule.forRootAsync({
+      inject: [ConfigService],
+      imports: [ConfigModule],
+      isGlobal: true,
+      useFactory: (config: ConfigService): PrismaServiceOptions => ({
+        client: {
+          datasources: {
+            db: {
+              url: config.getOrThrow<string>('DATABASE_URL'),
+            },
+          },
+        },
+      }),
+    }),
+  ],
 })
-export class AppModule {}
+export class App {}

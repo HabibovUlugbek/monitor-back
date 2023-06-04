@@ -1,6 +1,6 @@
 import type { ValidationOptions } from 'class-validator'
 import { ValidateBy, buildMessage } from 'class-validator'
-import { isPhone } from '@validators'
+import { isPhone } from '../validators'
 
 export const IsPhone = (validationOptions?: ValidationOptions): PropertyDecorator =>
   ValidateBy({
