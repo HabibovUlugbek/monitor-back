@@ -8,6 +8,7 @@ import { GlobalExceptionFilter } from '@exceptions'
 import { GlobalLoggerInterceptor } from '@logger'
 import { App } from './app.module'
 import { appConfig, swaggerConfig } from '@configs'
+import { MainModule } from '@modules'
 
 setImmediate(async (): Promise<void> => {
   const app = await NestFactory.create<NestExpressApplication>(App, new ExpressAdapter(), {
@@ -21,7 +22,6 @@ setImmediate(async (): Promise<void> => {
       preflightContinue: false,
       optionsSuccessStatus: 200,
     },
-    logger: false,
   })
 
   app.use(
@@ -48,15 +48,15 @@ setImmediate(async (): Promise<void> => {
     }),
   )
 
-  // const mainDocument = SwaggerModule.createDocument(app, swaggerConfig, {
-  //   include: [MainModule],
-  // })
+  const mainDocument = SwaggerModule.createDocument(app, swaggerConfig, {
+    include: [MainModule],
+  })
 
-  // SwaggerModule.setup('/docs-main', app, mainDocument, {
-  //   swaggerOptions: {
-  //     defaultModelsExpandDepth: -1,
-  //   },
-  // })
+  SwaggerModule.setup('/docs-main', app, mainDocument, {
+    swaggerOptions: {
+      defaultModelsExpandDepth: -1,
+    },
+  })
 
   await app.listen(Number(appConfig.port), String(appConfig.host))
 })

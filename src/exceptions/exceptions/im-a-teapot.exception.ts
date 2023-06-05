@@ -1,5 +1,5 @@
 import { Exception } from './exception'
-import { HttpStatus, HttpMessage } from '@enums'
+import { HttpStatus, HttpMessage } from '../enums'
 
 export class ImATeapotException extends Exception {
   constructor(details?: unknown, message?: string) {

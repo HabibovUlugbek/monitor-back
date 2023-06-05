@@ -39,7 +39,10 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "importHelpers": true,
+    "strictNullChecks": false,
   },
   "exclude": [
     "**/*.int-spec.ts",
