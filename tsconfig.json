@@ -8,27 +8,36 @@
     "lib": [
       "ESNext"
     ],
-        "paths": {
-      "@/*": [
-        "./*"
+    "paths": {
+      "@logger": [
+        "./logger"
+      ],
+      "@clients": [
+        "./clients"
       ],
       "@configs": [
         "./configs"
       ],
-      "@logger": [
-        "./logger"
+      "@helpers": [
+        "./helpers"
       ],
       "@modules": [
         "./modules"
       ],
-      "@helper": [
-        "./helper"
+      "@constants": [
+        "./constants"
       ],
       "@interfaces": [
         "./interfaces"
       ],
+      "@validators": [
+        "./validators"
+      ],
       "@exceptions": [
         "./exceptions"
+      ],
+      "@interceptors": [
+        "./interceptors"
       ],
     },
      "strict": true,

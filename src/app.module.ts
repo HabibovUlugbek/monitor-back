@@ -1,7 +1,7 @@
 import type { PrismaServiceOptions } from '@modules'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { PrismaModule } from '@modules'
+import { MainModule, NotFoundModule, PrismaModule } from '@modules'
 import { databaseConfig } from '@configs'
 
 @Module({
@@ -25,6 +25,8 @@ import { databaseConfig } from '@configs'
         },
       }),
     }),
+    MainModule,
+    NotFoundModule,
   ],
 })
 export class App {}
