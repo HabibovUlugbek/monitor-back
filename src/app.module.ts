@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { MainModule, NotFoundModule, PrismaModule } from '@modules'
 import { databaseConfig } from '@configs'
+import { HealthModule } from 'modules/health'
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { databaseConfig } from '@configs'
         },
       }),
     }),
+    HealthModule,
     MainModule,
     NotFoundModule,
   ],
