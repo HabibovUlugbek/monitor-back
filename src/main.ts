@@ -4,11 +4,11 @@ import { NestFactory } from '@nestjs/core'
 import { VersioningType } from '@nestjs/common'
 import { SwaggerModule } from '@nestjs/swagger'
 import { ExpressAdapter } from '@nestjs/platform-express'
-import { GlobalExceptionFilter } from '@exceptions'
+import { App } from './app'
 import { GlobalLoggerInterceptor } from '@logger'
-import { App } from './app.module'
 import { appConfig, swaggerConfig } from '@configs'
 import { MainModule } from '@modules'
+import { GlobalExceptionFilter } from '@exceptions'
 
 setImmediate(async (): Promise<void> => {
   const app = await NestFactory.create<NestExpressApplication>(App, new ExpressAdapter(), {

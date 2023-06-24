@@ -30,7 +30,16 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register jest --config jest.config.json --watch --runInBand",
     "test:cover": "jest --config jest.config.json --coverage",
     "docs:build": "compodoc --tsconfig tsconfig.build.json --output docs",
-    "docs:serve": "compodoc --tsconfig tsconfig.build.json --output docs --serve"
+    "docs:serve": "compodoc --tsconfig tsconfig.build.json --output docs --serve",
+    "prisma:format": "./node_modules/.bin/prisma format",
+    "prisma:validate": "./node_modules/.bin/prisma validate",
+    "prisma:generate": "./node_modules/.bin/prisma generate",
+    "migrate:create": "./node_modules/.bin/prisma migrate dev",
+    "migrate:deploy": "./node_modules/.bin/prisma migrate deploy",
+    "migrate:resolve": "./node_modules/.bin/prisma migrate resolve",
+    "migrate:status": "./node_modules/.bin/prisma migrate status",
+    "migrate:reset": "./node_modules/.bin/prisma migrate reset"
+
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",

@@ -1,73 +1,147 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Template
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## References
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+- [NodeJS](https://nodejs.org) - [Docs](https://nodejs.org/en/docs) - [GitHub](https://github.com/nodejs)
+- [TypeScript](https://www.typescriptlang.org) - [Docs](https://www.typescriptlang.org/docs) -
+  [GitHub](https://github.com/microsoft/TypeScript)
+- [ESLint](https://eslint.org) - [Docs](https://eslint.org/docs) - [GitHub](https://github.com/eslint)
+- [Prettier](https://prettier.io) - [Docs](https://prettier.io/docs/en/index.html) -
+  [GitHub](https://github.com/prettier)
+- [Jest](https://jestjs.io) - [Docs](https://jestjs.io/docs/getting-started) -
+  [GitHub](https://github.com/facebook/jest)
+- [NestJS](https://nestjs.com) - [Docs](https://docs.nestjs.com/) - [GitHub](https://github.com/nestjs)
+- [Prisma](https://www.prisma.io) - [Docs](https://www.prisma.io/docs) - [GitHub](https://github.com/prisma)
+- [Docker](https://www.docker.com) - [Docs](https://docs.docker.com) - [GitHub](https://github.com/docker)
+- [Postgres](https://www.postgresql.org) - [Docs](https://www.postgresql.org/docs) -
+  [GitHub](https://github.com/postgres)
 
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+## Installation dependencies
 
 ```bash
 $ npm install
 ```
 
+## Copy .env.example to .env
+
+```bash
+$ cp .env.example .env
+```
+
+## Build the app
+
+```bash
+$ npm run build
+```
+
 ## Running the app
 
 ```bash
-# development
+
+# for format code
+$ npm run fmt
+
+# in development mode
 $ npm run start
 
-# watch mode
-$ npm run start:dev
+# in watch mode
+$ npm run start:watch
 
-# production mode
+# in debug mode
+$ npm run start:debug
+
+# in production mode
 $ npm run start:prod
 ```
 
-## Test
+## Testing the app
 
 ```bash
-# unit tests
+# run all tests
 $ npm run test
 
-# e2e tests
+# run all tests in watch mode
+$ npm run test:watch
+
+# run all tests in debug mode
+$ npm run test:debug
+
+# coverage all tests
+$ npm run test:coverage
+
+# run int tests
+$ npm run test:int
+
+# run int tests in watch mode
+$ npm run test:int:watch
+
+# run int tests in debug mode
+$ npm run test:int:debug
+
+# run e2e tests
 $ npm run test:e2e
 
-# test coverage
-$ npm run test:cov
+# run e2e tests in watch mode
+$ npm run test:e2e:watch
+
+# run e2e tests in debug mode
+$ npm run test:e2e:debug
 ```
 
-## Support
+## Docs the app
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# build docs
+$ npm run docs
 
-## Stay in touch
+# serve docs
+$ npm run docs:serve
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Prisma
 
-## License
+```bash
+# format prisma schema
+$ npm run prisma:format
 
-Nest is [MIT licensed](LICENSE).
+# validate prisma schema
+$ npm run prisma:validate
+
+# generate prisma client
+$ npm run prisma:generate
+
+# create migration
+$ npm run migrate:create --name <name> --create-only
+
+# deploy migrations
+$ npm run migrate:deploy
+
+# resolve migration
+$ npm run migrate:resolve --applied <name>
+$ npm run migrate:resolve --rolled-back <name>
+
+# status migrations
+$ npm run migrate:status
+
+# reset database
+$ npm run migrate:reset
+```
+
+## Postgres Container
+
+```bash
+# create postgres volume
+$ docker volume create postgres_data
+
+# run postgres container
+$ docker run \
+  --env TZ=UTC \
+  --env POSTGRES_DB=postgres \
+  --env POSTGRES_USER=postgres \
+  --env POSTGRES_PASSWORD=postgres \
+  --name postgres \
+  --publish 5432:5432 \
+  --restart unless-stopped \
+  --volume postgres_data:/var/lib/postgresql/data \
+  --detach postgres:alpine
+```

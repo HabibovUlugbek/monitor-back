@@ -1,5 +1,5 @@
 import { Body, Controller, HttpCode, Post, UseInterceptors } from '@nestjs/common'
-import { ApiBody, ApiHeaders, ApiResponse } from '@nestjs/swagger'
+import { ApiBody, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ExampleDto } from './dtos'
 import { MainService } from './main.service'
 import {
@@ -12,7 +12,11 @@ import {
 } from '@exceptions'
 import { ContentLanguageInterceptor } from '@interceptors'
 
-@Controller()
+@ApiTags('Main Service')
+@Controller({
+  path: 'auth',
+  version: '1',
+})
 export class MainController {
   readonly #_service: MainService
 
