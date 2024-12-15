@@ -7,7 +7,7 @@ import { ExpressAdapter } from '@nestjs/platform-express'
 import { App } from './app'
 import { GlobalLoggerInterceptor } from '@logger'
 import { appConfig, swaggerConfig } from '@configs'
-import { MainModule } from '@modules'
+import { AdminModule, SuperAdminModule } from '@modules'
 import { GlobalExceptionFilter } from '@exceptions'
 
 setImmediate(async (): Promise<void> => {
@@ -47,12 +47,21 @@ setImmediate(async (): Promise<void> => {
       service: appConfig.name,
     }),
   )
-
-  const mainDocument = SwaggerModule.createDocument(app, swaggerConfig, {
-    include: [MainModule],
+  const superAdminDocument = SwaggerModule.createDocument(app, swaggerConfig, {
+    include: [SuperAdminModule],
   })
 
-  SwaggerModule.setup('/docs-main', app, mainDocument, {
+  SwaggerModule.setup('/docs-superadmin', app, superAdminDocument, {
+    swaggerOptions: {
+      defaultModelsExpandDepth: -1,
+    },
+  })
+
+  const mainDocument = SwaggerModule.createDocument(app, swaggerConfig, {
+    include: [AdminModule],
+  })
+
+  SwaggerModule.setup('/docs', app, mainDocument, {
     swaggerOptions: {
       defaultModelsExpandDepth: -1,
     },

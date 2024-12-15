@@ -1,14 +1,14 @@
 import type { PrismaServiceOptions } from '@modules'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { MainModule, NotFoundModule, PrismaModule } from '@modules'
-import { databaseConfig } from '@configs'
+import { AdminModule, NotFoundModule, PrismaModule, SuperAdminModule } from '@modules'
+import { databaseConfig, jwtConfig } from '@configs'
 import { HealthModule } from 'modules/health'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      load: [databaseConfig],
+      load: [databaseConfig, jwtConfig],
       cache: true,
       isGlobal: true,
     }),
@@ -27,7 +27,8 @@ import { HealthModule } from 'modules/health'
       }),
     }),
     HealthModule,
-    MainModule,
+    AdminModule,
+    SuperAdminModule,
     NotFoundModule,
   ],
 })
