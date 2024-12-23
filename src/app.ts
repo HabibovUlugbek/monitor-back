@@ -1,9 +1,8 @@
 import type { PrismaServiceOptions } from '@modules'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { AdminModule, NotFoundModule, PrismaModule, SuperAdminModule } from '@modules'
+import { AdminModule, NotFoundModule, PrismaModule, SuperAdminModule, LoanModule, HealthModule } from '@modules'
 import { databaseConfig, jwtConfig } from '@configs'
-import { HealthModule } from 'modules/health'
 
 @Module({
   imports: [
@@ -28,6 +27,7 @@ import { HealthModule } from 'modules/health'
     }),
     HealthModule,
     AdminModule,
+    LoanModule,
     SuperAdminModule,
     NotFoundModule,
   ],

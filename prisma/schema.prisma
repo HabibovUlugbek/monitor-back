@@ -9,11 +9,18 @@ generator client {
 
 enum Role {
   REPUBLIC_BOSS
-  PEPUBLIC_EMPLOYEE
+  REPUBLIC_EMPLOYEE
   REGION_BOSS
   REGION_EMPLOYEE
   REGION_CHECKER_BOSS
   REGION_CHECKER_EMPLOYEE
+}
+
+enum LoanStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
 }
 
 model Admin {
@@ -24,25 +31,46 @@ model Admin {
   region String? 
   role   Role    @default(REGION_EMPLOYEE)
   notifications Notification[]
+  loanHistory   LoanHistory[]
+
+  @@index([region], name: "region_index")
+
+  @@map("admins")
 }
 
 model Loan {
   id         String   @id @default(dbgenerated("gen_random_uuid()"))
+  codeRegion String
+  borrower   String
+  loanNumber String?
+  codeVal    String
   amount     Float
+  remaining  Float
+  docNumber  String
+  clientType String
+  inn        String
+  clientCode String
   issuedAt   DateTime @default(now())
   dueDate    DateTime
   returned   Boolean  @default(false)
-  borrower   String
   history    LoanHistory[]
   notifications Notification[]
+
+  @@map("loans")
 }
+
+
 
 model LoanHistory {
   id      String   @id @default(dbgenerated("gen_random_uuid()"))
   loan    Loan     @relation(fields: [loanId], references: [id])
+  assignee   Admin    @relation(fields: [assigneeId], references: [id])
+  assigneeId String
   loanId  String
-  status  String
+  status  LoanStatus
   date    DateTime @default(now())
+
+  @@map("loan_histories")
 }
 
 model Notification {
@@ -53,10 +81,14 @@ model Notification {
   loan      Loan     @relation(fields: [loanId], references: [id])
   adminId   String
   loanId  String
+
+  @@map("notifications")
 }
 
 model SuperAdmin {
   id       String  @id @default(dbgenerated("gen_random_uuid()"))
   username String  @unique
   password String
+
+  @@map("super_admins")
 }

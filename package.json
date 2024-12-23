@@ -1,7 +1,7 @@
 {
-  "name": "nest-monolith-template",
+  "name": "monitor-back",
   "bugs": {
-    "url": "https://github.com/HabibovUlugbek/nest-monolith-template/-/issues",
+    "url": "https://github.com/HabibovUlugbek/monitor-back/-/issues",
     "email": "habibovUlugbek22@gmail.com"
   },
   "author": {
@@ -11,9 +11,9 @@
   "version": "1.0.0",
   "license": "MIT",
   "private": true,
-  "homepage": "https://github.com/HabibovUlugbek/nest-monolith-template",
+  "homepage": "https://github.com/HabibovUlugbek/monitor-back",
   "repository": {
-    "url": "https://github.com/HabibovUlugbek/nest-monolith-template.git",
+    "url": "https://github.com/HabibovUlugbek/monitor-back.git",
     "type": "git"
   },
   "description": "Nestjs Monolith Template",

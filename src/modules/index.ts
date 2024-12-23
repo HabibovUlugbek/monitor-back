@@ -1,4 +1,6 @@
 export * from './prisma'
 export * from './super-admin'
 export * from './admin'
+export * from './loan'
+export * from './health'
 export * from './not-found'
