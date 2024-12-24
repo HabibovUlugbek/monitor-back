@@ -17,7 +17,7 @@ export class VerySuperAdminInterceptor implements NestInterceptor {
 
     try {
       const decoded: any = jwt.verify(token, process.env.JWT_SECRET)
-      const admin = await this.prisma.admin.findUnique({
+      const admin = await this.prisma.superAdmin.findUnique({
         where: { id: decoded.id },
       })
 

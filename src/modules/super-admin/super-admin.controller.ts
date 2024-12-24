@@ -1,6 +1,7 @@
-import { Body, Controller, Delete, HttpCode, Post, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpCode, Post, UseInterceptors } from '@nestjs/common'
 import { ApiBody, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
+  AdminResponseDto,
   DeleteRequestDto,
   RefreshTokenRequestDto,
   RefreshTokenResponseDto,
@@ -137,5 +138,36 @@ export class SuperAdminController {
   })
   async deleteSuperAdmin(@Body() body: DeleteRequestDto): Promise<void> {
     await this.#_service.deleteSuperAdmin(body)
+  }
+
+  @Get('admins')
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    type: AdminResponseDto,
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: UnprocessableEntityDto,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: HttpMessage.UNPROCESSABLE_ENTITY,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async getAdmins(): Promise<AdminResponseDto[]> {
+    return await this.#_service.getAdmins()
   }
 }

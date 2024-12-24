@@ -5,6 +5,7 @@ import { ConflictException, NotFoundException } from '@exceptions'
 import { DeleteRequest, RefreshTokenRequest, RefreshTokenResponse, SignInRequest, SignInResponse } from './interfaces'
 import * as crypto from 'crypto'
 import * as jwt from 'jsonwebtoken'
+import { AdminResponseDto } from './dtos'
 
 @Injectable()
 export class SuperAdminService {
@@ -72,5 +73,17 @@ export class SuperAdminService {
       throw new ConflictException('Invalid password')
     }
     await this.#_prisma.superAdmin.delete({ where: { id: superAdmin.id } })
+  }
+
+  async getAdmins(): Promise<AdminResponseDto[]> {
+    const admins = await this.#_prisma.admin.findMany()
+
+    return admins.map((admin) => ({
+      id: admin.id,
+      username: admin.username,
+      name: admin.name,
+      region: admin?.region,
+      role: admin.role,
+    }))
   }
 }

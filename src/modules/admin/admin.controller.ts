@@ -19,7 +19,7 @@ import {
 import { VerySuperAdminInterceptor } from '@interceptors'
 import { AdminService } from './admin.service'
 
-@ApiTags('Super Admin Service')
+@ApiTags('Admin Service')
 @Controller({
   path: 'admin',
   version: '1',

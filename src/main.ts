@@ -9,15 +9,16 @@ import { GlobalLoggerInterceptor } from '@logger'
 import { appConfig, swaggerConfig } from '@configs'
 import { AdminModule, LoanModule, SuperAdminModule } from '@modules'
 import { GlobalExceptionFilter } from '@exceptions'
+import { ValidationPipe } from '@validators'
 
 setImmediate(async (): Promise<void> => {
   const app = await NestFactory.create<NestExpressApplication>(App, new ExpressAdapter(), {
     cors: {
       maxAge: 0,
-      origin: ['*'],
-      methods: ['*'],
-      credentials: false,
-      allowedHeaders: ['*'],
+      origin: ['http://localhost:3000'],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      credentials: true,
+      allowedHeaders: ['Content-Type', 'Authorization'],
       exposedHeaders: [],
       preflightContinue: false,
       optionsSuccessStatus: 200,
@@ -40,6 +41,13 @@ setImmediate(async (): Promise<void> => {
     prefix: 'api/v',
   })
 
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      stopAtFirstError: true,
+    }),
+  )
   app.useGlobalFilters(new GlobalExceptionFilter())
 
   app.useGlobalInterceptors(
