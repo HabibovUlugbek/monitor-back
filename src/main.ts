@@ -7,7 +7,7 @@ import { ExpressAdapter } from '@nestjs/platform-express'
 import { App } from './app'
 import { GlobalLoggerInterceptor } from '@logger'
 import { appConfig, swaggerConfig } from '@configs'
-import { AdminModule, LoanModule, SuperAdminModule } from '@modules'
+import { AdminModule, LoanModule, NotificationModule, SuperAdminModule } from '@modules'
 import { GlobalExceptionFilter } from '@exceptions'
 import { ValidationPipe } from '@validators'
 
@@ -66,7 +66,7 @@ setImmediate(async (): Promise<void> => {
   })
 
   const mainDocument = SwaggerModule.createDocument(app, swaggerConfig, {
-    include: [AdminModule, LoanModule],
+    include: [AdminModule, LoanModule, NotificationModule],
   })
 
   SwaggerModule.setup('/docs', app, mainDocument, {

@@ -1,7 +1,15 @@
 import type { PrismaServiceOptions } from '@modules'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { AdminModule, NotFoundModule, PrismaModule, SuperAdminModule, LoanModule, HealthModule } from '@modules'
+import {
+  AdminModule,
+  NotFoundModule,
+  PrismaModule,
+  SuperAdminModule,
+  LoanModule,
+  HealthModule,
+  NotificationModule,
+} from '@modules'
 import { databaseConfig, jwtConfig } from '@configs'
 
 @Module({
@@ -29,6 +37,7 @@ import { databaseConfig, jwtConfig } from '@configs'
     AdminModule,
     LoanModule,
     SuperAdminModule,
+    NotificationModule,
     NotFoundModule,
   ],
 })
