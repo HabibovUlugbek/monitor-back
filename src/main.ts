@@ -16,7 +16,7 @@ setImmediate(async (): Promise<void> => {
     cors: {
       maxAge: 0,
       origin: ['http://localhost:3000'],
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization'],
       exposedHeaders: [],

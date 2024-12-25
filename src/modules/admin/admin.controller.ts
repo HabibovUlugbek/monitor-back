@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, HttpCode, Param, Patch, Post, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Req, UseInterceptors } from '@nestjs/common'
 import { ApiBody, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateAdminDto,
@@ -16,8 +16,10 @@ import {
   InternalServerErrorDto,
   UnprocessableEntityDto,
 } from '@exceptions'
-import { VerySuperAdminInterceptor } from '@interceptors'
+import { VerifyRolesInterceptor, VerifyAdminInterceptor } from '@interceptors'
 import { AdminService } from './admin.service'
+import { AdminResponseDto } from 'modules/super-admin/dtos'
+import { Request } from 'express'
 
 @ApiTags('Admin Service')
 @Controller({
@@ -99,8 +101,8 @@ export class AdminController {
     return this.#_service.refreshToken(body)
   }
 
-  @Delete('delete')
-  @UseInterceptors(VerySuperAdminInterceptor)
+  @Delete('/:id')
+  @UseInterceptors(VerifyRolesInterceptor)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiHeaders([
     {
@@ -133,11 +135,13 @@ export class AdminController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
-  async deleteAdmin(@Param() id: string): Promise<void> {
+  async deleteAdmin(@Param() { id }: { id: string }): Promise<void> {
+    console.log('id', id)
     await this.#_service.deleteAdmin(id.toString())
   }
 
   @Post()
+  @UseInterceptors(VerifyRolesInterceptor)
   @HttpCode(HttpStatus.CREATED)
   @ApiBody({
     type: SignInRequestDto,
@@ -172,6 +176,7 @@ export class AdminController {
   }
 
   @Patch('/:id')
+  @UseInterceptors(VerifyRolesInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiBody({
     type: SignInRequestDto,
@@ -203,5 +208,59 @@ export class AdminController {
   })
   async updateAdmin(@Param('id') id: string, @Body() body: UpdateAdminDto): Promise<void> {
     await this.#_service.updateAdmin(id, body)
+  }
+
+  @Get('')
+  @UseInterceptors(VerifyAdminInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    type: AdminResponseDto,
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async getAdmins(@Req() req: Request & { userId: string }): Promise<AdminResponseDto[]> {
+    return await this.#_service.getAdmins(req.userId)
+  }
+
+  @Get('me')
+  @UseInterceptors(VerifyAdminInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    type: AdminResponseDto,
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async getMe(@Req() req: Request & { userId: string }): Promise<AdminResponseDto> {
+    return await this.#_service.getMe(req.userId)
   }
 }

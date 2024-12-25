@@ -18,7 +18,9 @@ export class SuperAdminService {
   }
 
   async signIn(payload: SignInRequest): Promise<SignInResponse> {
-    const superAdmin = await this.#_prisma.superAdmin.findUnique({ where: { username: payload.username } })
+    const { password, ...superAdmin } = await this.#_prisma.superAdmin.findUnique({
+      where: { username: payload.username },
+    })
 
     if (!superAdmin) {
       throw new NotFoundException('Super admin not found')
@@ -26,7 +28,7 @@ export class SuperAdminService {
 
     const hashedPassword = crypto.createHash('sha256').update(payload.password).digest('hex')
 
-    if (superAdmin.password !== hashedPassword) {
+    if (password !== hashedPassword) {
       throw new ConflictException('Invalid password')
     }
 
@@ -42,7 +44,7 @@ export class SuperAdminService {
   async refreshToken({ refreshToken }: RefreshTokenRequest): Promise<RefreshTokenResponse> {
     try {
       const decoded = jwt.verify(refreshToken, this.#_jwt_secret) as { id: string }
-      const superAdmin = await this.#_prisma.superAdmin.findUnique({ where: { id: decoded.id } })
+      const { password, ...superAdmin } = await this.#_prisma.superAdmin.findUnique({ where: { id: decoded.id } })
 
       if (!superAdmin) {
         throw new NotFoundException('Super admin not found')

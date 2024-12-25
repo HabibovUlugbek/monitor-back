@@ -4,7 +4,7 @@ import { PrismaService } from '@modules'
 import * as jwt from 'jsonwebtoken'
 
 @Injectable()
-export class VerySuperAdminInterceptor implements NestInterceptor {
+export class VerifySuperAdminInterceptor implements NestInterceptor {
   constructor(private readonly prisma: PrismaService) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {

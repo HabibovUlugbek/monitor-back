@@ -17,7 +17,7 @@ import {
   InternalServerErrorDto,
   UnprocessableEntityDto,
 } from '@exceptions'
-import { VerySuperAdminInterceptor } from '@interceptors'
+import { VerifySuperAdminInterceptor } from '@interceptors'
 
 @ApiTags('Super Admin Service')
 @Controller({
@@ -100,7 +100,7 @@ export class SuperAdminController {
   }
 
   @Delete('delete')
-  @UseInterceptors(VerySuperAdminInterceptor)
+  @UseInterceptors(VerifySuperAdminInterceptor)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiHeaders([
     {
@@ -141,6 +141,7 @@ export class SuperAdminController {
   }
 
   @Get('admins')
+  @UseInterceptors(VerifySuperAdminInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     type: AdminResponseDto,
