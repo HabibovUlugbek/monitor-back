@@ -34,6 +34,8 @@ export class VerifyRolesInterceptor implements NestInterceptor {
       if (admin && ![String(Role.REPUBLIC_BOSS), Role.REPUBLIC_EMPLOYEE].includes(String(admin.role))) {
         throw new ForbiddenException("You don't have permission to access this resource")
       }
+
+      request.userId = decoded.id
       return next.handle()
     } catch (error) {
       throw new ForbiddenException('Invalid token')

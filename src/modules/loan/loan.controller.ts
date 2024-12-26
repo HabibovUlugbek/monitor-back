@@ -9,6 +9,7 @@ import {
   UnprocessableEntityDto,
 } from '@exceptions'
 import { LoanService } from './loan.service'
+import { VerifyAdminInterceptor } from '@interceptors'
 
 @ApiTags('Loan Service')
 @Controller({
@@ -23,6 +24,7 @@ export class LoanController {
   }
 
   @Get()
+  @UseInterceptors(VerifyAdminInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiHeaders([
     {

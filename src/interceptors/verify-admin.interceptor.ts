@@ -25,7 +25,7 @@ export class VerifyAdminInterceptor implements NestInterceptor {
         throw new ForbiddenException('Access denied')
       }
 
-      request.userId = decoded.id // Add userId to request
+      request.userId = decoded.id
 
       return next.handle()
     } catch (error) {

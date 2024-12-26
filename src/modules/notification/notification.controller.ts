@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Param, HttpCode, Req } from '@nestjs/common'
+import { Controller, Get, Post, Param, HttpCode, Req, UseInterceptors } from '@nestjs/common'
 import { NotificationService } from './notification.service'
 import { ApiResponse, ApiTags } from '@nestjs/swagger'
 import { ForbiddenDto, HttpMessage, HttpStatus, InternalServerErrorDto, UnprocessableEntityDto } from '@exceptions'
 import { GetNotificationsDto } from './dtos/get-notifications.dto'
+import { VerifyAdminInterceptor } from '@interceptors'
 
 @ApiTags('Notifications Service')
 @Controller({
@@ -17,6 +18,7 @@ export class NotificationController {
   }
 
   @Get()
+  @UseInterceptors(VerifyAdminInterceptor)
   @HttpCode(HttpStatus.OK)
   @ApiResponse({
     type: GetNotificationsDto,
@@ -44,6 +46,7 @@ export class NotificationController {
   }
 
   @Post('/:id')
+  @UseInterceptors(VerifyAdminInterceptor)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,

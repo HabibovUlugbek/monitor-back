@@ -7,28 +7,30 @@ import { NotFoundException } from '@exceptions'
 export class LoanService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getLoans(payload: { userId: string }) {
-    const loanIds = await this.prisma.loanHistory.findMany({
+  async getLoans(payload: { userId: string }): Promise<any[]> {
+    const user = await this.prisma.admin.findFirst({
       where: {
-        assigneeId: payload.userId,
-        status: LoanStatus.PENDING,
-      },
-      select: {
-        loanId: true,
+        id: payload.userId,
       },
     })
 
-    const loandIdArray = loanIds.map((loan) => loan.loanId)
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
 
-    const loans = await this.prisma.loan.findMany({
-      where: {
-        id: {
-          in: loandIdArray,
-        },
-      },
-    })
+    // if (user.role === Role.REGION_EMPLOYEE) {
+    //   return this.getLoansForRegionEmployee(payload)
+    // } else if (user.role === Role.REGION_BOSS) {
+    //   return this.getLoansForRegionBoss(payload)
+    // } else if (user.role === Role.REGION_CHECKER_EMPLOYEE) {
+    //   return this.getLoansForMonitoringBoss(payload)
+    // } else if (user.role === Role.REGION_CHECKER_BOSS) {
+    //   return this.getLoansForMonitoringBoss(payload)
+    // } else {
+    //   return this.getLoansForRepublic()
+    // }
 
-    return loans
+    return []
   }
 
   async assignLoan(payload: { userId: string; loanId: string }) {
