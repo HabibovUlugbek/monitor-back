@@ -32,6 +32,7 @@ model Admin {
   role   Role    @default(REGION_EMPLOYEE)
   notifications Notification[]
   loanHistory   LoanHistory[]
+  messages      Message[]
 
   @@index([region], name: "region_index")
 
@@ -56,6 +57,7 @@ model Loan {
   createdAt  DateTime @default(now())
   history    LoanHistory[]
   notifications Notification[]
+  messages      Message[]
 
   @@map("loans")
 }
@@ -93,4 +95,17 @@ model SuperAdmin {
   password String
 
   @@map("super_admins")
+}
+
+model Message {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  message   String
+  createdAt DateTime @default(now())
+
+  loan     Loan     @relation(fields: [loanId], references: [id])
+  loanId   String
+  admin     Admin?    @relation(fields: [adminId], references: [id])
+  adminId   String
+
+  @@map("messages")
 }

@@ -10,6 +10,7 @@ import {
 } from '@exceptions'
 import { LoanService } from './loan.service'
 import { VerifyAdminInterceptor } from '@interceptors'
+import { AssignLoanRequestDto, GetLoanResponseDto, GetLoansDto } from './dtos'
 
 @ApiTags('Loan Service')
 @Controller({
@@ -36,7 +37,8 @@ export class LoanController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: HttpMessage.OK,
-    // type: [SignInResponseDto],
+    type: GetLoansDto,
+    isArray: true,
   })
   @ApiResponse({
     type: ForbiddenDto,
@@ -58,19 +60,19 @@ export class LoanController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
-  async getLoans(userId: string): Promise<any[]> {
-    return this.#_service.getLoans({ userId })
+  async getLoans(userId: string): Promise<GetLoansDto[]> {
+    return this.#_service.getLoans(userId)
   }
 
   @Post('assign')
-  @HttpCode(HttpStatus.CREATED)
+  @UseInterceptors(VerifyAdminInterceptor)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({
-    // type: SignInRequestDto,
+    type: AssignLoanRequestDto,
   })
   @ApiResponse({
-    // type: SignInResponseDto,
-    status: HttpStatus.CREATED,
-    description: HttpMessage.CREATED,
+    status: HttpStatus.NO_CONTENT,
+    description: HttpMessage.NO_CONTENT,
   })
   @ApiResponse({
     type: ForbiddenDto,
@@ -92,19 +94,24 @@ export class LoanController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
-  async assignLoan(@Body() body: any): Promise<any> {
-    return this.#_service.assignLoan(body)
+  async assignLoan(@Body() body: AssignLoanRequestDto): Promise<void> {
+    await this.#_service.assignLoan(body)
   }
 
-  @Post('upload')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiBody({
-    // type: SignInRequestDto,
-  })
+  @Get(':id')
+  @UseInterceptors(VerifyAdminInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Authorization token',
+      required: true,
+    },
+  ])
   @ApiResponse({
-    // type: SignInResponseDto,
-    status: HttpStatus.CREATED,
-    description: HttpMessage.CREATED,
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+    type: GetLoanResponseDto,
   })
   @ApiResponse({
     type: ForbiddenDto,
@@ -126,7 +133,41 @@ export class LoanController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
-  async uploadLoanInfo(@Body() body: any): Promise<any> {
-    return this.#_service.uploadLoanInfo(body)
+  async getLoan(@Param('id') id: string): Promise<GetLoanResponseDto> {
+    return this.#_service.getLoan(id)
   }
+
+  // @Post('upload')
+  // @HttpCode(HttpStatus.CREATED)
+  // @ApiBody({
+  //   // type: SignInRequestDto,
+  // })
+  // @ApiResponse({
+  //   // type: SignInResponseDto,
+  //   status: HttpStatus.CREATED,
+  //   description: HttpMessage.CREATED,
+  // })
+  // @ApiResponse({
+  //   type: ForbiddenDto,
+  //   status: HttpStatus.FORBIDDEN,
+  //   description: HttpMessage.FORBIDDEN,
+  // })
+  // @ApiResponse({
+  //   type: ConflictDto,
+  //   status: HttpStatus.CONFLICT,
+  //   description: HttpMessage.CONFLICT,
+  // })
+  // @ApiResponse({
+  //   type: UnprocessableEntityDto,
+  //   status: HttpStatus.UNPROCESSABLE_ENTITY,
+  //   description: HttpMessage.UNPROCESSABLE_ENTITY,
+  // })
+  // @ApiResponse({
+  //   type: InternalServerErrorDto,
+  //   status: HttpStatus.INTERNAL_SERVER_ERROR,
+  //   description: HttpMessage.INTERNAL_SERVER_ERROR,
+  // })
+  // async uploadLoanInfo(@Body() body: any): Promise<any> {
+  //   return this.#_service.uploadLoanInfo(body)
+  // }
 }
