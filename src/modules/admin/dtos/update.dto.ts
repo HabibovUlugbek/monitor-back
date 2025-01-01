@@ -1,18 +1,13 @@
 import { IsString, IsOptional, IsEnum } from 'class-validator'
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { CreateAdminRequest } from '../interfaces'
+import { UpdateAdminRequest } from '../interfaces'
 import { Role } from '@prisma/client'
 
-export class UpdateAdminDto implements CreateAdminRequest {
+export class UpdateAdminDto implements UpdateAdminRequest {
   @ApiPropertyOptional({ example: 'admin' })
   @IsString()
   @IsOptional()
   username: string
-
-  @ApiPropertyOptional({ example: 'password123' })
-  @IsString()
-  @IsOptional()
-  password: string
 
   @ApiPropertyOptional({ example: 'John' })
   @IsOptional()
@@ -24,10 +19,15 @@ export class UpdateAdminDto implements CreateAdminRequest {
   @IsEnum(Role)
   @IsString()
   @IsOptional()
-  role: string
+  role?: string
 
   @ApiPropertyOptional({ example: '13' })
   @IsString()
   @IsOptional()
   region?: string
+
+  @ApiPropertyOptional({ example: '123' })
+  @IsString()
+  @IsOptional()
+  bhmCode?: string
 }

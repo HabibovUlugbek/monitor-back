@@ -8,9 +8,11 @@ import {
   RefreshTokenResponse,
   SignInRequest,
   SignInResponse,
+  StatsFilterQuery,
+  StatsResponse,
   UpdateAdminRequest,
 } from './interfaces'
-import { Role } from '@prisma/client'
+import { LoanStatus, Role } from '@prisma/client'
 import { ConfigService } from '@nestjs/config'
 import { ConflictException, NotFoundException } from '@exceptions'
 import { AdminResponseDto } from 'modules/super-admin/dtos'
@@ -24,6 +26,16 @@ export class AdminService {
 
   async createAdmin(payload: CreateAdminRequest): Promise<void> {
     const hashedPassword = crypto.createHash('sha256').update(payload.password).digest('hex')
+
+    if (payload.role !== Role.REPUBLIC_BOSS) {
+      if (!payload.region) {
+        throw new ConflictException('Region is required')
+      }
+    }
+
+    if (payload.role === Role.REGION_CHECKER_EMPLOYEE && !payload.bhmCode) {
+      throw new ConflictException('BHM Code is required')
+    }
     await this.prisma.admin.create({
       data: {
         ...payload,
@@ -78,7 +90,6 @@ export class AdminService {
   }
 
   async getAdmins(userId: string): Promise<AdminResponseDto[]> {
-    //find admin by id
     const admin = await this.prisma.admin.findUnique({
       where: { id: userId },
     })
@@ -132,6 +143,129 @@ export class AdminService {
       username: me.username,
       role: me.role,
       region: me.region,
+    }
+  }
+
+  async getStats(userId: string, filter: StatsFilterQuery): Promise<StatsResponse[]> {
+    const admin = await this.prisma.admin.findUnique({
+      where: { id: userId },
+    })
+
+    if (!admin) {
+      throw new NotFoundException('Admin not found')
+    }
+
+    if (admin.role === Role.REPUBLIC_BOSS) {
+      const stats = await this.prisma.admin.findMany({
+        where: {
+          loanHistory: {
+            some: {
+              date: {
+                gte: filter.startDate,
+                lte: filter.endDate,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          role: true,
+          region: true,
+          loanHistory: {
+            select: {
+              status: true,
+            },
+          },
+        },
+      })
+
+      return stats.map((admin) => {
+        const result = {
+          inProcess: 0,
+          rejected: 0,
+          outdated: 0,
+          approved: 0,
+        }
+
+        admin.loanHistory.forEach((loan) => {
+          if (loan.status === LoanStatus.PENDING) {
+            result.inProcess++
+          } else if (loan.status === LoanStatus.REJECTED) {
+            result.rejected++
+          } else if (loan.status === LoanStatus.OUTDATED) {
+            result.outdated++
+          } else if (loan.status === LoanStatus.APPROVED) {
+            result.approved++
+          }
+        })
+
+        return {
+          id: admin.id,
+          name: admin.name,
+          username: admin.username,
+          role: admin.role,
+          region: admin.region,
+          stats: result,
+        }
+      })
+    } else if (admin.role === Role.REPUBLIC_EMPLOYEE) {
+      const stats = await this.prisma.admin.findMany({
+        where: {
+          region: admin.region,
+          loanHistory: {
+            some: {
+              date: {
+                gte: filter.startDate,
+                lte: filter.endDate,
+              },
+            },
+          },
+        },
+        select: {
+          id: true,
+          name: true,
+          username: true,
+          role: true,
+          region: true,
+          loanHistory: {
+            select: {
+              status: true,
+            },
+          },
+        },
+      })
+
+      return stats.map((admin) => {
+        const result = {
+          inProcess: 0,
+          rejected: 0,
+          outdated: 0,
+          approved: 0,
+        }
+
+        admin.loanHistory.forEach((loan) => {
+          if (loan.status === LoanStatus.PENDING) {
+            result.inProcess++
+          } else if (loan.status === LoanStatus.REJECTED) {
+            result.rejected++
+          } else if (loan.status === LoanStatus.OUTDATED) {
+            result.outdated++
+          } else if (loan.status === LoanStatus.APPROVED) {
+            result.approved++
+          }
+        })
+
+        return {
+          id: admin.id,
+          name: admin.name,
+          username: admin.username,
+          role: admin.role,
+          region: admin.region,
+          stats: result,
+        }
+      })
     }
   }
 }

@@ -1,4 +1,4 @@
-import { IsString, IsEmail, IsOptional, IsIn, IsEnum } from 'class-validator'
+import { IsString, IsOptional, IsEnum, MinLength } from 'class-validator'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import { CreateAdminRequest } from '../interfaces'
 import { Role } from '@prisma/client'
@@ -9,6 +9,7 @@ export class CreateAdminDto implements CreateAdminRequest {
   username: string
 
   @ApiProperty({ example: 'password123' })
+  @MinLength(8)
   @IsString()
   password: string
 
@@ -21,10 +22,15 @@ export class CreateAdminDto implements CreateAdminRequest {
   @IsEnum(Role)
   @IsString()
   @IsOptional()
-  role: string
+  role: Role
 
   @ApiPropertyOptional({ example: '13' })
   @IsString()
   @IsOptional()
   region?: string
+
+  @ApiPropertyOptional({ example: '123' })
+  @IsString()
+  @IsOptional()
+  bhmCode?: string
 }

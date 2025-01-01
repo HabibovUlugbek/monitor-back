@@ -1,4 +1,17 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Req, UseInterceptors } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseInterceptors,
+} from '@nestjs/common'
 import { ApiBody, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   CreateAdminDto,
@@ -7,6 +20,8 @@ import {
   SignInRequestDto,
   SignInResponseDto,
   UpdateAdminDto,
+  StatsFilterQueryDto,
+  StatsResponseDto,
 } from './dtos'
 import {
   ConflictDto,
@@ -142,14 +157,13 @@ export class AdminController {
 
   @Post()
   @UseInterceptors(VerifyRolesInterceptor)
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({
-    type: SignInRequestDto,
+    type: CreateAdminDto,
   })
   @ApiResponse({
-    type: SignInResponseDto,
-    status: HttpStatus.CREATED,
-    description: HttpMessage.CREATED,
+    status: HttpStatus.NO_CONTENT,
+    description: HttpMessage.NO_CONTENT,
   })
   @ApiResponse({
     type: ForbiddenDto,
@@ -177,14 +191,14 @@ export class AdminController {
 
   @Patch('/:id')
   @UseInterceptors(VerifyRolesInterceptor)
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBody({
-    type: SignInRequestDto,
+    type: UpdateAdminDto,
   })
   @ApiResponse({
     type: SignInResponseDto,
-    status: HttpStatus.OK,
-    description: HttpMessage.OK,
+    status: HttpStatus.NO_CONTENT,
+    description: HttpMessage.NO_CONTENT,
   })
   @ApiResponse({
     type: ForbiddenDto,
@@ -262,5 +276,36 @@ export class AdminController {
   })
   async getMe(@Req() req: Request & { userId: string }): Promise<AdminResponseDto> {
     return await this.#_service.getMe(req.userId)
+  }
+
+  @Get('stats')
+  @UseInterceptors(VerifyRolesInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiResponse({
+    type: StatsResponseDto,
+    isArray: true,
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async getStats(
+    @Query() filter: StatsFilterQueryDto,
+    @Res() { userId }: { userId: string },
+  ): Promise<StatsResponseDto[]> {
+    return await this.#_service.getStats(userId, filter)
   }
 }

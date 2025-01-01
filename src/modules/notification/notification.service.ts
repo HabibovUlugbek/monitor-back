@@ -7,11 +7,14 @@ export class NotificationService {
   constructor(private prisma: PrismaService) {}
 
   async getNotifications(userId: string): Promise<NotificationInterface[]> {
+    console.log(userId)
     const notifications = await this.prisma.notification.findMany({
-      take: 10,
       where: { adminId: userId, read: false },
-      orderBy: { read: 'asc', createdAt: 'desc' },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
     })
+
+    console.log(notifications)
 
     return notifications
   }

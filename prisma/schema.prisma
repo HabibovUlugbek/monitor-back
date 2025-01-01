@@ -28,7 +28,8 @@ model Admin {
   username String  @unique
   password String
   name   String
-  region String? 
+  region String?
+  bhmcode String? 
   role   Role    @default(REGION_EMPLOYEE)
   notifications Notification[]
   loanHistory   LoanHistory[]
