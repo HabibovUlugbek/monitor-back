@@ -40,11 +40,25 @@ export class LoadLoanService {
         },
         select: { id: true },
       })
+      const checker = await this.prisma.admin.findFirst({
+        where: {
+          region: loan.codeRegion,
+          bhmCode: loan.bhmCode,
+        },
+      })
 
       await this.prisma.notification.create({
         data: {
           message: `Sizga ${loanId} raqamli kredit bo'lib berish uchun berildi`,
           adminId: regionBossId,
+          loanId,
+        },
+      })
+
+      await await this.prisma.notification.create({
+        data: {
+          message: `Sizga ${loanId} raqamli kredit tekshirish uchun berildi`,
+          adminId: checker.id,
           loanId,
         },
       })

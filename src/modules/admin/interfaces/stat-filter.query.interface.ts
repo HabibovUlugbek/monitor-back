@@ -1,6 +1,6 @@
 export interface StatsFilterQuery {
-  startDate?: string
-  endDate?: string
+  startDate?: Date
+  endDate?: Date
   region?: string
 }
 

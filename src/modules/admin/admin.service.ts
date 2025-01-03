@@ -36,13 +36,15 @@ export class AdminService {
     if (payload.role === Role.REGION_CHECKER_EMPLOYEE && !payload.bhmCode) {
       throw new ConflictException('BHM Code is required')
     }
-    await this.prisma.admin.create({
-      data: {
-        ...payload,
-        role: payload.role as Role,
-        password: hashedPassword,
-      },
-    })
+    await this.prisma.admin
+      .create({
+        data: {
+          ...payload,
+          role: payload.role as Role,
+          password: hashedPassword,
+        },
+      })
+      .catch((err) => console.log(err))
   }
 
   async signIn(payload: SignInRequest): Promise<SignInResponse> {
@@ -100,9 +102,14 @@ export class AdminService {
 
     const admins = []
 
-    if (admin.role === Role.REPUBLIC_BOSS || admin.role === Role.REPUBLIC_EMPLOYEE) {
+    if (admin.role === Role.REPUBLIC_BOSS) {
       const result = await this.prisma.admin.findMany({
         where: { id: { not: userId } },
+      })
+      admins.push(...result)
+    } else if (admin.role === Role.REPUBLIC_EMPLOYEE) {
+      const result = await this.prisma.admin.findMany({
+        where: { id: { not: userId }, region: admin.region },
       })
       admins.push(...result)
     } else if (admin.role === Role.REGION_BOSS) {
@@ -155,117 +162,80 @@ export class AdminService {
       throw new NotFoundException('Admin not found')
     }
 
-    if (admin.role === Role.REPUBLIC_BOSS) {
-      const stats = await this.prisma.admin.findMany({
-        where: {
-          loanHistory: {
-            some: {
-              date: {
-                gte: filter.startDate,
-                lte: filter.endDate,
-              },
-            },
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          role: true,
-          region: true,
-          loanHistory: {
-            select: {
-              status: true,
-            },
-          },
-        },
-      })
-
-      return stats.map((admin) => {
-        const result = {
-          inProcess: 0,
-          rejected: 0,
-          outdated: 0,
-          approved: 0,
-        }
-
-        admin.loanHistory.forEach((loan) => {
-          if (loan.status === LoanStatus.PENDING) {
-            result.inProcess++
-          } else if (loan.status === LoanStatus.REJECTED) {
-            result.rejected++
-          } else if (loan.status === LoanStatus.OUTDATED) {
-            result.outdated++
-          } else if (loan.status === LoanStatus.APPROVED) {
-            result.approved++
-          }
-        })
-
-        return {
-          id: admin.id,
-          name: admin.name,
-          username: admin.username,
-          role: admin.role,
-          region: admin.region,
-          stats: result,
-        }
-      })
-    } else if (admin.role === Role.REPUBLIC_EMPLOYEE) {
-      const stats = await this.prisma.admin.findMany({
-        where: {
-          region: admin.region,
-          loanHistory: {
-            some: {
-              date: {
-                gte: filter.startDate,
-                lte: filter.endDate,
-              },
-            },
-          },
-        },
-        select: {
-          id: true,
-          name: true,
-          username: true,
-          role: true,
-          region: true,
-          loanHistory: {
-            select: {
-              status: true,
-            },
-          },
-        },
-      })
-
-      return stats.map((admin) => {
-        const result = {
-          inProcess: 0,
-          rejected: 0,
-          outdated: 0,
-          approved: 0,
-        }
-
-        admin.loanHistory.forEach((loan) => {
-          if (loan.status === LoanStatus.PENDING) {
-            result.inProcess++
-          } else if (loan.status === LoanStatus.REJECTED) {
-            result.rejected++
-          } else if (loan.status === LoanStatus.OUTDATED) {
-            result.outdated++
-          } else if (loan.status === LoanStatus.APPROVED) {
-            result.approved++
-          }
-        })
-
-        return {
-          id: admin.id,
-          name: admin.name,
-          username: admin.username,
-          role: admin.role,
-          region: admin.region,
-          stats: result,
-        }
-      })
+    if (!filter.startDate) {
+      const now = new Date()
+      filter.startDate = new Date(now.getFullYear(), now.getMonth(), 1)
     }
+
+    if (!filter.endDate) {
+      filter.endDate = new Date()
+    }
+
+    if (!filter.region && admin.role !== Role.REPUBLIC_BOSS) {
+      filter.region = admin.region
+    }
+
+    const query: any = {
+      loanHistory: {
+        some: {
+          loan: {
+            createdAt: {
+              gte: filter.startDate,
+              lte: filter.endDate,
+            },
+          },
+        },
+      },
+    }
+
+    if (filter.region) {
+      query.region = filter.region
+    }
+
+    const stats = await this.prisma.admin.findMany({
+      where: query,
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        role: true,
+        region: true,
+        loanHistory: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    })
+
+    return stats.map((admin) => {
+      const result = {
+        inProcess: 0,
+        rejected: 0,
+        outdated: 0,
+        approved: 0,
+      }
+
+      admin.loanHistory.forEach((loan) => {
+        if (loan.status === LoanStatus.PENDING) {
+          result.inProcess++
+        } else if (loan.status === LoanStatus.REJECTED) {
+          result.rejected++
+        } else if (loan.status === LoanStatus.OUTDATED) {
+          result.outdated++
+        } else if (loan.status === LoanStatus.APPROVED) {
+          result.approved++
+        }
+      })
+
+      return {
+        id: admin.id,
+        name: admin.name,
+        username: admin.username,
+        role: admin.role,
+        region: admin.region,
+        stats: result,
+      }
+    })
   }
 }

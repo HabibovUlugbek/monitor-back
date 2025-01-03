@@ -29,7 +29,7 @@ model Admin {
   password String
   name   String
   region String?
-  bhmcode String? 
+  bhmCode String? 
   role   Role    @default(REGION_EMPLOYEE)
   notifications Notification[]
   loanHistory   LoanHistory[]
@@ -52,6 +52,7 @@ model Loan {
   clientType String
   inn        String
   clientCode String
+  bhmCode    String 
   issuedAt   DateTime 
   dueDate    DateTime
   returned   Boolean  @default(false)

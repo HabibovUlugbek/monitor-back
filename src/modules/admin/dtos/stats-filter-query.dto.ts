@@ -1,17 +1,17 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsOptional, IsString } from 'class-validator'
+import { IsDate, IsOptional, IsString } from 'class-validator'
 import { StatsFilterQuery, StatsResponse, TaskStats } from '../interfaces'
 
 export class StatsFilterQueryDto implements StatsFilterQuery {
   @ApiPropertyOptional({ example: '2021-01-01' })
-  @IsString()
+  @IsDate()
   @IsOptional()
-  startDate?: string
+  startDate?: Date
 
   @ApiPropertyOptional({ example: '2021-01-31' })
-  @IsString()
+  @IsDate()
   @IsOptional()
-  endDate?: string
+  endDate?: Date
 
   @ApiPropertyOptional({ example: '03' })
   @IsString()

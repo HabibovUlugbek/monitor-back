@@ -23,15 +23,13 @@ export class LoanService {
       return this.#_getLoansForRegionEmployee(userId)
     } else if (user.role === Role.REGION_BOSS) {
       return this.#_getLoansForRegionBoss(user.region)
+    } else if (user.role === Role.REGION_CHECKER_BOSS) {
+      return this.#_getLoansForMonitoringBoss(user.region)
+    } else if (user.role === Role.REGION_CHECKER_EMPLOYEE) {
+      return this.#_getLoansForMonitoringEmployee(user.bhmCode)
     } else {
       return this.#_getLoansForRepublic()
     }
-
-    // else if (user.role === Role.REGION_CHECKER_EMPLOYEE) {
-    //   return this.getLoansForMonitoringBoss(payload)
-    // } else if (user.role === Role.REGION_CHECKER_BOSS) {
-    //   return this.getLoansForMonitoringBoss(payload)
-    // }
   }
 
   async assignLoan(payload: AssignLoanRequest) {
@@ -75,6 +73,98 @@ export class LoanService {
     // create notifications for monitoring boshliq
   }
 
+  async approveLoan(loanId: string, userId: string) {
+    const loan = await this.prisma.loan.findFirst({
+      where: {
+        id: loanId,
+        history: {
+          some: {
+            assigneeId: userId,
+            status: LoanStatus.PENDING,
+          },
+        },
+      },
+    })
+
+    if (!loan) {
+      throw new NotFoundException('Loan not found')
+    }
+
+    const user = await this.prisma.admin.findFirst({
+      where: {
+        id: userId,
+      },
+    })
+
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    await this.prisma.loanHistory.create({
+      data: {
+        assigneeId: userId,
+        loanId,
+        status: LoanStatus.APPROVED,
+      },
+    })
+
+    await this.prisma.notification.create({
+      data: {
+        adminId: userId,
+        message: `Sizning ${loanId} raqamli kreditingiz tasdiqlandi`,
+        loanId,
+      },
+    })
+
+    // create notifications for monitoring boshliq
+  }
+
+  async rejectLoan(loanId: string, userId: string) {
+    const loan = await this.prisma.loan.findFirst({
+      where: {
+        id: loanId,
+        history: {
+          some: {
+            assigneeId: userId,
+            status: LoanStatus.PENDING,
+          },
+        },
+      },
+    })
+
+    if (!loan) {
+      throw new NotFoundException('Loan not found')
+    }
+
+    const user = await this.prisma.admin.findFirst({
+      where: {
+        id: userId,
+      },
+    })
+
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    await this.prisma.loanHistory.create({
+      data: {
+        assigneeId: userId,
+        loanId,
+        status: LoanStatus.REJECTED,
+      },
+    })
+
+    await this.prisma.notification.create({
+      data: {
+        adminId: userId,
+        message: `Sizning ${loanId} raqamli kreditingiz rad etildi`,
+        loanId,
+      },
+    })
+
+    // create notifications for monitoring boshliq
+  }
+
   async getLoan(id: string): Promise<GetLoanResponse> {
     return this.prisma.loan.findFirst({
       where: {
@@ -107,7 +197,19 @@ export class LoanService {
         history: {
           some: {
             assigneeId: userId,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        history: {
+          where: {
             status: LoanStatus.PENDING,
+          },
+          include: {
+            assignee: true,
           },
         },
       },
@@ -118,9 +220,17 @@ export class LoanService {
     return this.prisma.loan.findMany({
       where: {
         codeRegion: regionCode,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
         history: {
-          some: {
+          where: {
             status: LoanStatus.PENDING,
+          },
+          include: {
+            assignee: true,
           },
         },
       },
@@ -132,6 +242,58 @@ export class LoanService {
       where: {
         createdAt: {
           gte: new Date(new Date().setDate(new Date().getDate() - 7)),
+        },
+      },
+      include: {
+        history: {
+          where: {
+            status: LoanStatus.PENDING,
+          },
+          include: {
+            assignee: true,
+          },
+        },
+      },
+    })
+  }
+
+  async #_getLoansForMonitoringBoss(region: string) {
+    return this.prisma.loan.findMany({
+      where: {
+        codeRegion: region,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        history: {
+          where: {
+            status: LoanStatus.PENDING,
+          },
+          include: {
+            assignee: true,
+          },
+        },
+      },
+    })
+  }
+
+  async #_getLoansForMonitoringEmployee(bhmCode: string) {
+    return this.prisma.loan.findMany({
+      where: {
+        bhmCode,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        history: {
+          where: {
+            status: LoanStatus.PENDING,
+          },
+          include: {
+            assignee: true,
+          },
         },
       },
     })
