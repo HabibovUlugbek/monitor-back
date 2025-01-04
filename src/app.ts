@@ -11,9 +11,15 @@ import {
   NotificationModule,
 } from '@modules'
 import { databaseConfig, jwtConfig } from '@configs'
+import { join } from 'path'
+import { ServeStaticModule } from '@nestjs/serve-static'
 
 @Module({
   imports: [
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'), // Path to the folder with static files
+      serveRoot: '/files', // Optional: Set a URL prefix for the static files
+    }),
     ConfigModule.forRoot({
       load: [databaseConfig, jwtConfig],
       cache: true,
@@ -38,7 +44,7 @@ import { databaseConfig, jwtConfig } from '@configs'
     LoanModule,
     SuperAdminModule,
     NotificationModule,
-    NotFoundModule,
+    // NotFoundModule,
   ],
 })
 export class App {}

@@ -23,6 +23,7 @@ export class LoanService {
     if (user.role === Role.REGION_EMPLOYEE) {
       return this.#_getLoansForRegionEmployee(userId)
     } else if (user.role === Role.REGION_BOSS) {
+      console.log('hello')
       return this.#_getLoansForRegionBoss(user.region)
     } else if (user.role === Role.REGION_CHECKER_BOSS) {
       return this.#_getLoansForMonitoringBoss(user.region)
@@ -33,7 +34,7 @@ export class LoanService {
     }
   }
 
-  async assignLoan(payload: AssignLoanRequest) {
+  async assignLoan(payload: AssignLoanRequest, adminId: string) {
     const loan = await this.prisma.loan.findFirst({
       where: {
         id: payload.loanId,
@@ -60,6 +61,17 @@ export class LoanService {
         assigneeId: payload.userId,
         loanId: payload.loanId,
         status: LoanStatus.PENDING,
+      },
+    })
+
+    await this.prisma.loanHistory.updateMany({
+      where: {
+        loanId: payload.loanId,
+        assigneeId: adminId,
+        status: LoanStatus.PENDING,
+      },
+      data: {
+        status: LoanStatus.APPROVED,
       },
     })
 
@@ -263,6 +275,50 @@ export class LoanService {
     return statistics
   }
 
+  async uploadInfo(loanId: string, filePath: string, userId: string) {
+    await this.prisma.loanHistory.updateMany({
+      where: {
+        loanId: loanId,
+        assigneeId: userId,
+        status: LoanStatus.PENDING,
+      },
+      data: {
+        status: LoanStatus.APPROVED,
+      },
+    })
+
+    const loan = await this.prisma.loan.findFirst({
+      where: {
+        id: loanId,
+      },
+    })
+
+    const regionChecker = await this.prisma.admin.findFirst({
+      where: {
+        role: Role.REGION_CHECKER_EMPLOYEE,
+        region: loan?.bhmCode,
+      },
+    })
+
+    if (regionChecker) {
+      await this.prisma.notification.create({
+        data: {
+          adminId: regionChecker.id,
+          message: `${loanId} raqamli kredit tekshirish uchun berildi`,
+          loanId: loanId,
+        },
+      })
+    }
+
+    await this.prisma.message.create({
+      data: {
+        adminId: userId,
+        message: `File uploaded: http://localhost:4000${filePath}`,
+        loanId: loanId,
+      },
+    })
+  }
+
   async sendMessage(userId: string, payload: SendMessageRequestDto) {
     await this.prisma.message.create({
       data: {
@@ -299,6 +355,7 @@ export class LoanService {
   }
 
   async #_getLoansForRegionBoss(regionCode: string) {
+    console.log(regionCode)
     return this.prisma.loan.findMany({
       where: {
         codeRegion: regionCode,

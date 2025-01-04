@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Req, UseInterceptors } from '@nestjs/common'
+import { Body, Controller, Get, HttpCode, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
 import { ApiBody, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   ConflictDto,
@@ -8,9 +8,14 @@ import {
   InternalServerErrorDto,
   UnprocessableEntityDto,
 } from '@exceptions'
+import { FileInterceptor } from '@nestjs/platform-express'
+import { diskStorage } from 'multer'
+import { createReadStream } from 'fs'
+import { join } from 'path'
 import { LoanService } from './loan.service'
 import { VerifyAdminInterceptor, VerifyRolesInterceptor } from '@interceptors'
 import { AssignLoanRequestDto, GetLoanResponseDto, GetLoansDto, LoanStatsDto, SendMessageRequestDto } from './dtos'
+import { Response } from 'express'
 
 @ApiTags('Loan Service')
 @Controller({
@@ -54,8 +59,8 @@ export class LoanController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
-  async assignLoan(@Body() body: AssignLoanRequestDto): Promise<void> {
-    await this.#_service.assignLoan(body)
+  async assignLoan(@Body() body: AssignLoanRequestDto, @Req() { userId }: { userId: string }): Promise<void> {
+    await this.#_service.assignLoan(body, userId)
   }
 
   @Get(':id')
@@ -173,39 +178,27 @@ export class LoanController {
     await this.#_service.rejectLoan(id, userId)
   }
 
-  @Post('upload')
+  @Post(':loanId/upload')
   @HttpCode(HttpStatus.CREATED)
-  @ApiBody({
-    // type: SignInRequestDto,
-  })
-  @ApiResponse({
-    // type: SignInResponseDto,
-    status: HttpStatus.CREATED,
-    description: HttpMessage.CREATED,
-  })
-  @ApiResponse({
-    type: ForbiddenDto,
-    status: HttpStatus.FORBIDDEN,
-    description: HttpMessage.FORBIDDEN,
-  })
-  @ApiResponse({
-    type: ConflictDto,
-    status: HttpStatus.CONFLICT,
-    description: HttpMessage.CONFLICT,
-  })
-  @ApiResponse({
-    type: UnprocessableEntityDto,
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: HttpMessage.UNPROCESSABLE_ENTITY,
-  })
-  @ApiResponse({
-    type: InternalServerErrorDto,
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: HttpMessage.INTERNAL_SERVER_ERROR,
-  })
-  async uploadLoanInfo(@Body() body: any): Promise<any> {
-    // return this.#_service.uploadLoanInfo(body)
-    return []
+  @UseInterceptors(VerifyAdminInterceptor)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads', // Save to `uploads` folder
+        filename: (req, file, cb) => {
+          const fileName = `${Date.now()}-${file.originalname}`
+          cb(null, fileName) // Generate a unique file name
+        },
+      }),
+    }),
+  )
+  uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @Param('loanId') loanId: string,
+    @Req() { userId }: { userId: string },
+  ) {
+    const filePath = `/files/${file?.filename}`
+    this.#_service.uploadInfo(loanId, filePath, userId)
   }
 
   @Post('stats')
@@ -283,7 +276,8 @@ export class LoanController {
     status: HttpStatus.INTERNAL_SERVER_ERROR,
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
-  async getLoans(userId: string): Promise<GetLoansDto[]> {
+  async getLoans(@Req() { userId }: { userId: string }): Promise<GetLoansDto[]> {
+    console.log(userId)
     return this.#_service.getLoans(userId)
   }
 
