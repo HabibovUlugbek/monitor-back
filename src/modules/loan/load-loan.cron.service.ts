@@ -73,9 +73,11 @@ export class LoadLoanService {
       })
 
       if (!regionBossId) {
-        Logger.error(`Region boss not found for region ${loan.codeRegion}`)
-        if (!regionBossId) return
+        // Logger.error(`Region boss not found for region ${loan.codeRegion}`)
+        return
       }
+
+      console.log(regionBossId)
       const { id: loanId } = await this.prisma.loan.create({
         data: {
           codeRegion: loan.code_region,
@@ -126,6 +128,6 @@ export class LoadLoanService {
       })
     })
 
-    Logger.log(mockData.length, ' loans loaded')
+    Logger.log(loadData.length, ' loans loaded')
   }
 }
