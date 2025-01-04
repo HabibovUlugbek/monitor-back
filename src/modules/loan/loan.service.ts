@@ -357,7 +357,7 @@ export class LoanService {
     console.log(regionCode)
     return this.prisma.loan.findMany({
       where: {
-        codeRegion: Number(regionCode) as unknown as string,
+        codeRegion: String(Number(regionCode)) as unknown as string,
       },
       orderBy: {
         createdAt: 'desc',
