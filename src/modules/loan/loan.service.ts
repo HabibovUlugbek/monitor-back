@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common'
 import { PrismaService } from '@modules'
 import { LoanStatus, Role } from '@prisma/client'
 import { NotFoundException } from '@exceptions'
-import { AssignLoanRequest, GetLoanResponse, Loan } from './interfaces'
+import { AssignLoanRequest, GetLoanResponse, Loan, LoanStats } from './interfaces'
+import { SendMessageRequestDto } from './dtos'
 
 @Injectable()
 export class LoanService {
@@ -187,6 +188,87 @@ export class LoanService {
             createdAt: true,
           },
         },
+      },
+    })
+  }
+
+  async getLoanStats(): Promise<LoanStats[]> {
+    const loans = await this.prisma.loan.findMany({
+      where: {
+        createdAt: {
+          gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          lt: new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1),
+        },
+      },
+      include: {
+        history: {
+          orderBy: {
+            date: 'desc',
+          },
+          take: 1,
+        },
+      },
+    })
+
+    const result: {
+      [key: string]: {
+        inProcess: number
+        rejected: number
+        outdated: number
+        approved: number
+      }
+    } = {}
+
+    loans.forEach((loan) => {
+      const latestHistory = loan.history[0]
+      let regionResult = result[loan.codeRegion]
+      if (!regionResult) {
+        regionResult = {
+          inProcess: 0,
+          rejected: 0,
+          outdated: 0,
+          approved: 0,
+        }
+      }
+      if (latestHistory) {
+        switch (latestHistory.status) {
+          case LoanStatus.PENDING:
+            regionResult.inProcess++
+            break
+          case LoanStatus.REJECTED:
+            regionResult.rejected++
+            break
+          case LoanStatus.APPROVED:
+            regionResult.approved++
+            break
+          case LoanStatus.OUTDATED:
+            regionResult.outdated++
+            break
+          default:
+            break
+        }
+      }
+
+      result[loan.codeRegion] = regionResult
+    })
+
+    const statistics: LoanStats[] = []
+    Object.entries(result).forEach(([region, stats]) => {
+      statistics.push({
+        region,
+        ...stats,
+      })
+    })
+
+    return statistics
+  }
+
+  async sendMessage(userId: string, payload: SendMessageRequestDto) {
+    await this.prisma.message.create({
+      data: {
+        adminId: userId,
+        message: payload.message,
+        loanId: payload.loanId,
       },
     })
   }

@@ -50,11 +50,12 @@ setImmediate(async (): Promise<void> => {
   )
   app.useGlobalFilters(new GlobalExceptionFilter())
 
-  app.useGlobalInterceptors(
-    new GlobalLoggerInterceptor({
-      service: appConfig.name,
-    }),
-  )
+  // app.useGlobalInterceptors(
+  //   new GlobalLoggerInterceptor({
+  //     service: appConfig.name,
+  //   }),
+  // )
+
   const superAdminDocument = SwaggerModule.createDocument(app, swaggerConfig, {
     include: [SuperAdminModule],
   })

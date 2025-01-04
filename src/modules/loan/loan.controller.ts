@@ -9,8 +9,8 @@ import {
   UnprocessableEntityDto,
 } from '@exceptions'
 import { LoanService } from './loan.service'
-import { VerifyAdminInterceptor } from '@interceptors'
-import { AssignLoanRequestDto, GetLoanResponseDto, GetLoansDto } from './dtos'
+import { VerifyAdminInterceptor, VerifyRolesInterceptor } from '@interceptors'
+import { AssignLoanRequestDto, GetLoanResponseDto, GetLoansDto, LoanStatsDto, SendMessageRequestDto } from './dtos'
 
 @ApiTags('Loan Service')
 @Controller({
@@ -22,46 +22,6 @@ export class LoanController {
 
   constructor(service: LoanService) {
     this.#_service = service
-  }
-
-  @Get()
-  @UseInterceptors(VerifyAdminInterceptor)
-  @HttpCode(HttpStatus.OK)
-  @ApiHeaders([
-    {
-      name: 'Authorization',
-      description: 'Authorization token',
-      required: true,
-    },
-  ])
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: HttpMessage.OK,
-    type: GetLoansDto,
-    isArray: true,
-  })
-  @ApiResponse({
-    type: ForbiddenDto,
-    status: HttpStatus.FORBIDDEN,
-    description: HttpMessage.FORBIDDEN,
-  })
-  @ApiResponse({
-    type: ConflictDto,
-    status: HttpStatus.CONFLICT,
-    description: HttpMessage.CONFLICT,
-  })
-  @ApiResponse({
-    type: UnprocessableEntityDto,
-    status: HttpStatus.UNPROCESSABLE_ENTITY,
-    description: HttpMessage.UNPROCESSABLE_ENTITY,
-  })
-  @ApiResponse({
-    type: InternalServerErrorDto,
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: HttpMessage.INTERNAL_SERVER_ERROR,
-  })
-  async getLoans(userId: string): Promise<GetLoansDto[]> {
-    return this.#_service.getLoans(userId)
   }
 
   @Post('assign')
@@ -213,37 +173,158 @@ export class LoanController {
     await this.#_service.rejectLoan(id, userId)
   }
 
-  // @Post('upload')
-  // @HttpCode(HttpStatus.CREATED)
-  // @ApiBody({
-  //   // type: SignInRequestDto,
-  // })
-  // @ApiResponse({
-  //   // type: SignInResponseDto,
-  //   status: HttpStatus.CREATED,
-  //   description: HttpMessage.CREATED,
-  // })
-  // @ApiResponse({
-  //   type: ForbiddenDto,
-  //   status: HttpStatus.FORBIDDEN,
-  //   description: HttpMessage.FORBIDDEN,
-  // })
-  // @ApiResponse({
-  //   type: ConflictDto,
-  //   status: HttpStatus.CONFLICT,
-  //   description: HttpMessage.CONFLICT,
-  // })
-  // @ApiResponse({
-  //   type: UnprocessableEntityDto,
-  //   status: HttpStatus.UNPROCESSABLE_ENTITY,
-  //   description: HttpMessage.UNPROCESSABLE_ENTITY,
-  // })
-  // @ApiResponse({
-  //   type: InternalServerErrorDto,
-  //   status: HttpStatus.INTERNAL_SERVER_ERROR,
-  //   description: HttpMessage.INTERNAL_SERVER_ERROR,
-  // })
-  // async uploadLoanInfo(@Body() body: any): Promise<any> {
-  //   return this.#_service.uploadLoanInfo(body)
-  // }
+  @Post('upload')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiBody({
+    // type: SignInRequestDto,
+  })
+  @ApiResponse({
+    // type: SignInResponseDto,
+    status: HttpStatus.CREATED,
+    description: HttpMessage.CREATED,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: UnprocessableEntityDto,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: HttpMessage.UNPROCESSABLE_ENTITY,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async uploadLoanInfo(@Body() body: any): Promise<any> {
+    // return this.#_service.uploadLoanInfo(body)
+    return []
+  }
+
+  @Post('stats')
+  @UseInterceptors(VerifyRolesInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Authorization token',
+      required: true,
+    },
+  ])
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+    type: LoanStatsDto,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: UnprocessableEntityDto,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: HttpMessage.UNPROCESSABLE_ENTITY,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async getLoanStats(): Promise<LoanStatsDto[]> {
+    return await this.#_service.getLoanStats()
+  }
+
+  @Get()
+  @UseInterceptors(VerifyAdminInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Authorization token',
+      required: true,
+    },
+  ])
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+    type: GetLoansDto,
+    isArray: true,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: UnprocessableEntityDto,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: HttpMessage.UNPROCESSABLE_ENTITY,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async getLoans(userId: string): Promise<GetLoansDto[]> {
+    return this.#_service.getLoans(userId)
+  }
+
+  @Post('send/message')
+  @UseInterceptors(VerifyAdminInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Authorization token',
+      required: true,
+    },
+  ])
+  @ApiBody({
+    type: SendMessageRequestDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: UnprocessableEntityDto,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: HttpMessage.UNPROCESSABLE_ENTITY,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async sendMessage(@Body() body: SendMessageRequestDto, @Req() { userId }: { userId: string }): Promise<void> {
+    await this.#_service.sendMessage(userId, body)
+  }
 }

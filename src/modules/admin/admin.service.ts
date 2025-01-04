@@ -36,15 +36,13 @@ export class AdminService {
     if (payload.role === Role.REGION_CHECKER_EMPLOYEE && !payload.bhmCode) {
       throw new ConflictException('BHM Code is required')
     }
-    await this.prisma.admin
-      .create({
-        data: {
-          ...payload,
-          role: payload.role as Role,
-          password: hashedPassword,
-        },
-      })
-      .catch((err) => console.log(err))
+    await this.prisma.admin.create({
+      data: {
+        ...payload,
+        role: payload.role as Role,
+        password: hashedPassword,
+      },
+    })
   }
 
   async signIn(payload: SignInRequest): Promise<SignInResponse> {

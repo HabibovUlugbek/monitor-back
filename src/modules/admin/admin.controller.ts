@@ -151,7 +151,6 @@ export class AdminController {
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
   async deleteAdmin(@Param() { id }: { id: string }): Promise<void> {
-    console.log('id', id)
     await this.#_service.deleteAdmin(id.toString())
   }
 
@@ -304,7 +303,7 @@ export class AdminController {
   })
   async getStats(
     @Query() filter: StatsFilterQueryDto,
-    @Res() { userId }: { userId: string },
+    @Req() { userId }: { userId: string },
   ): Promise<StatsResponseDto[]> {
     return await this.#_service.getStats(userId, filter)
   }
