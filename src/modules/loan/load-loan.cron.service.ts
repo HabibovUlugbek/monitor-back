@@ -10,11 +10,7 @@ export class LoadLoanService {
   private client: Client
   constructor(private readonly prisma: PrismaService) {
     this.client = new Client({
-      host: 'localhost',
-      port: 5432,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
+      connectionString: process.env.DATABASE_URL,
     })
 
     this.client.connect()
