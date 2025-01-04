@@ -23,7 +23,6 @@ export class LoanService {
     if (user.role === Role.REGION_EMPLOYEE) {
       return this.#_getLoansForRegionEmployee(userId)
     } else if (user.role === Role.REGION_BOSS) {
-      console.log('hello')
       return this.#_getLoansForRegionBoss(user.region)
     } else if (user.role === Role.REGION_CHECKER_BOSS) {
       return this.#_getLoansForMonitoringBoss(user.region)

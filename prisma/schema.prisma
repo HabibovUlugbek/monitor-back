@@ -43,24 +43,21 @@ model Admin {
 model Loan {
   id         String   @id @default(dbgenerated("gen_random_uuid()"))
   codeRegion String
-  borrower   String
-  loanNumber String?
-  codeVal    String
-  amount     Float
-  remaining  Float
-  docNumber  String
-  clientType String
-  inn        String
-  clientCode String
   bhmCode    String 
-  issuedAt   DateTime 
-  dueDate    DateTime
-  returned   Boolean  @default(false)
+  externalId String
+  borrower   String?
+  contractAmountEquvivalent Float?
+  amount     Float?
+  issuedAt   DateTime?
+  inspector  String? 
+  remaining  Float?
+  totalDebt  Float?
+  codeVal    String?
+
   createdAt  DateTime @default(now())
   history    LoanHistory[]
   notifications Notification[]
   messages      Message[]
-
   @@map("loans")
 }
 

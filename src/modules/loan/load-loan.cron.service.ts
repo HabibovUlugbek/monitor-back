@@ -3,10 +3,31 @@ import { Cron, CronExpression } from '@nestjs/schedule'
 import { LoanStatus, Role } from '@prisma/client'
 import { PrismaService } from 'modules/prisma'
 import { mockData } from './mock-loan'
+import { Client } from 'pg'
 
 @Injectable()
 export class LoadLoanService {
-  constructor(private readonly prisma: PrismaService) {}
+  private client: Client
+  constructor(private readonly prisma: PrismaService) {
+    this.client = new Client({
+      host: 'localhost',
+      port: 5432,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,
+    })
+
+    this.client.connect()
+  }
+
+  async fetchData(query: string, params: any[] = []) {
+    const result = await this.client.query(query, params)
+    return result.rows
+  }
+
+  async closeConnection() {
+    await this.client.end()
+  }
 
   @Cron(CronExpression.EVERY_WEEKDAY)
   async loadLoan() {
@@ -16,54 +37,89 @@ export class LoadLoanService {
       where: { role: Role.REGION_BOSS },
     })
 
-    mockData.forEach(async (loan) => {
-      let regionBossId
-      regionBosses.forEach((boss) => {
-        if (boss.region === loan.codeRegion) {
-          regionBossId = boss.id
-        }
-      })
+    const query = `SELECT a.code_region,
+    a.name_region,
+    b.filial,
+    b.code_bxm,
+    c.contract_amount_equivalent,
+    c.contract_amount_nominal,
+    c.contract_date,
+    c.inspector,
+    c.loan_id,c.overdue_balance,
+    c.total_debt,
+    c.currency_code,
+    c.client_name
 
-      if (!regionBossId) {
-        Logger.error(`Region boss not found for region ${loan.codeRegion}`)
-        if (!regionBossId) return
-      }
-      const { id: loanId } = await this.prisma.loan.create({
-        data: {
-          ...loan,
-          history: {
-            create: {
-              assigneeId: regionBossId,
-              status: LoanStatus.PENDING,
-            },
-          },
-        },
-        select: { id: true },
-      })
-      const checker = await this.prisma.admin.findFirst({
-        where: {
-          region: loan.codeRegion,
-          bhmCode: loan.bhmCode,
-        },
-      })
+    FROM public.nbu_region a 
+    join public.nbu_branch b on  a.id = b.region_id 
+    join public.nbu_maindata c on b.id = c.branch_id 
 
-      await this.prisma.notification.create({
-        data: {
-          message: `Sizga ${loanId} raqamli kredit bo'lib berish uchun berildi`,
-          adminId: regionBossId,
-          loanId,
-        },
-      })
+    where c.contract_date = $1`
+    const yesterday = new Date()
+    const dayOfWeek = yesterday.getDay()
+    if (dayOfWeek === 1) {
+      yesterday.setDate(yesterday.getDate() - 3) // Get Friday's date
+    } else {
+      yesterday.setDate(yesterday.getDate() - 1)
+    }
 
-      await await this.prisma.notification.create({
-        data: {
-          message: `Sizga ${loanId} raqamli kredit tekshirish uchun berildi`,
-          adminId: checker.id,
-          loanId,
-        },
-      })
-    })
+    const formattedDate = yesterday.toISOString().split('T')[0]
+    const loadData = await this.fetchData(query, [formattedDate])
 
-    Logger.log(mockData.length, ' loans loaded')
+    console.log(loadData)
+
+    // mockData.forEach(async (loan) => {
+    //   let regionBossId
+    //   regionBosses.forEach((boss) => {
+    //     if (boss.region === loan.codeRegion) {
+    //       regionBossId = boss.id
+    //     }
+    //   })
+
+    //   if (!regionBossId) {
+    //     Logger.error(`Region boss not found for region ${loan.codeRegion}`)
+    //     if (!regionBossId) return
+    //   }
+    //   const { id: loanId } = await this.prisma.loan.create({
+    //     data: {
+    //       ...loan,
+    //       history: {
+    //         create: {
+    //           assigneeId: regionBossId,
+    //           status: LoanStatus.PENDING,
+    //         },
+    //       },
+    //     },
+    //     select: { id: true },
+    //   })
+    //   await this.prisma.notification.create({
+    //     data: {
+    //       message: `Sizga ${loanId} raqamli kredit bo'lib berish uchun berildi`,
+    //       adminId: regionBossId,
+    //       loanId,
+    //     },
+    //   })
+
+    //   const checker = await this.prisma.admin.findFirst({
+    //     where: {
+    //       region: loan.codeRegion,
+    //       bhmCode: loan.bhmCode,
+    //     },
+    //   })
+    //   if (!checker) {
+    //     Logger.error(`Checker not found for region ${loan.codeRegion} and BHM code ${loan.bhmCode}`)
+    //     if (!checker) return
+    //   }
+
+    //   await this.prisma.notification.create({
+    //     data: {
+    //       message: `Sizga ${loanId} raqamli kredit tekshirish uchun berildi`,
+    //       adminId: checker.id,
+    //       loanId,
+    //     },
+    //   })
+    // })
+
+    // Logger.log(mockData.length, ' loans loaded')
   }
 }

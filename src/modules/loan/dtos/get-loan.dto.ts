@@ -69,26 +69,14 @@ export class GetLoanResponseDto implements GetLoanResponse {
   @ApiProperty({ example: 500 })
   remaining: number
 
-  @ApiProperty({ example: 'DOC12345' })
-  docNumber: string
+  @ApiProperty({ example: 'BHM123' })
+  bhmCode: string
 
-  @ApiProperty({ example: 'Individual' })
-  clientType: string
-
-  @ApiProperty({ example: '1234567890' })
-  inn: string
-
-  @ApiProperty({ example: 'C12345' })
-  clientCode: string
+  @ApiProperty({ example: 'EXT123' })
+  externalId: string
 
   @ApiProperty({ example: '2023-01-01T00:00:00.000Z' })
   issuedAt: Date
-
-  @ApiProperty({ example: '2023-12-31T00:00:00.000Z' })
-  dueDate: Date
-
-  @ApiProperty({ example: true })
-  returned: boolean
 
   @ApiProperty({ example: '2023-01-01T00:00:00.000Z' })
   createdAt: Date

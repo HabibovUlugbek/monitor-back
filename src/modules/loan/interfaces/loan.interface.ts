@@ -6,12 +6,11 @@ export interface Loan {
   codeVal: string
   amount: number
   remaining: number
-  docNumber: string
-  clientType: string
-  inn: string
-  clientCode: string
   issuedAt: Date
-  dueDate: Date
-  returned: boolean
   createdAt: Date
+  bhmCode: string
+  externalId: string
+  contractAmountEquvivalent?: number
+  inspector?: string
+  totalDebt?: number
 }
