@@ -10,7 +10,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost): Response {
     const express = host.switchToHttp()
     const response = express.getResponse<Response>()
-
+    console.log(exception)
     if (exception instanceof Exception) {
       const status = exception.getStatus()
       const message = exception.getMessage()
