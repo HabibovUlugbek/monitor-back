@@ -62,22 +62,15 @@ export class LoadLoanService {
       where: { role: Role.REGION_BOSS },
     })
 
-    console.log(regionBosses)
-
     loadData.forEach(async (loan) => {
-      let regionBossId
-      regionBosses.forEach((boss) => {
-        if (boss.region === String(loan.code_region)) {
-          regionBossId = boss.id
-        }
-      })
+      const regionBoss = regionBosses.find((reg) => reg.region === loan.code_region)
 
-      if (!regionBossId) {
+      if (!regionBoss) {
         // Logger.error(`Region boss not found for region ${loan.codeRegion}`)
         return
       }
 
-      console.log(regionBossId)
+      console.log(regionBoss)
       const { id: loanId } = await this.prisma.loan.create({
         data: {
           codeRegion: loan.code_region,
@@ -93,7 +86,7 @@ export class LoadLoanService {
           borrower: loan.client_name,
           history: {
             create: {
-              assigneeId: regionBossId,
+              assigneeId: regionBoss.id,
               status: LoanStatus.PENDING,
             },
           },
@@ -103,7 +96,7 @@ export class LoadLoanService {
       await this.prisma.notification.create({
         data: {
           message: `Sizga ${loanId} raqamli kredit bo'lib berish uchun berildi`,
-          adminId: regionBossId,
+          adminId: regionBoss.id,
           loanId,
         },
       })
