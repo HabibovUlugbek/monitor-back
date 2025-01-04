@@ -63,7 +63,7 @@ export class LoadLoanService {
     })
 
     loadData.forEach(async (loan) => {
-      const regionBoss = regionBosses.find((reg) => reg.region === loan.code_region)
+      const regionBoss = regionBosses.find((reg) => Number(reg.region) === Number(loan.code_region))
 
       if (!regionBoss) {
         // Logger.error(`Region boss not found for region ${loan.codeRegion}`)
