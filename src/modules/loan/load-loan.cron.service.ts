@@ -29,10 +29,6 @@ export class LoadLoanService {
   async loadLoan() {
     Logger.log('Loading loan data...', 'LoanCron')
 
-    const regionBosses = await this.prisma.admin.findMany({
-      where: { role: Role.REGION_BOSS },
-    })
-
     const query = `SELECT a.code_region,
     a.name_region,
     b.filial,
@@ -62,7 +58,11 @@ export class LoadLoanService {
     const formattedDate = yesterday.toISOString().split('T')[0]
     const loadData = await this.fetchData(query, ['2024-04-13'])
 
-    console.log(loadData)
+    const regionBosses = await this.prisma.admin.findMany({
+      where: { role: Role.REGION_BOSS },
+    })
+
+    console.log(regionBosses)
 
     loadData.forEach(async (loan) => {
       let regionBossId
