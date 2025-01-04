@@ -73,8 +73,8 @@ export class LoadLoanService {
       console.log(regionBoss)
       const { id: loanId } = await this.prisma.loan.create({
         data: {
-          codeRegion: loan.code_region,
-          bhmCode: loan.code_bxm,
+          codeRegion: String(loan.code_region),
+          bhmCode: String(loan.code_bxm),
           contractAmountEquvivalent: loan.contract_amount_equivalent,
           amount: loan.contract_amount_nominal,
           issuedAt: new Date(loan.contract_date),
