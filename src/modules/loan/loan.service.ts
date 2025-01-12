@@ -82,7 +82,40 @@ export class LoanService {
       },
     })
 
-    // create notifications for monitoring boshliq
+    const checkerEmp = await this.prisma.admin.findFirst({
+      where: {
+        bhmCode: loan.bhmCode,
+        region: loan.codeRegion,
+        role: Role.REGION_CHECKER_EMPLOYEE,
+      },
+    })
+
+    if (checkerEmp) {
+      await this.prisma.notification.create({
+        data: {
+          adminId: checkerEmp.id,
+          message: `Yangi ${payload.loanId} raqamli kredit monitoring uchun berildi`,
+          loanId: payload.loanId,
+        },
+      })
+    }
+
+    const checkerBoss = await this.prisma.admin.findFirst({
+      where: {
+        region: loan.codeRegion,
+        role: Role.REGION_CHECKER_BOSS,
+      },
+    })
+
+    if (checkerBoss) {
+      await this.prisma.notification.create({
+        data: {
+          adminId: checkerBoss.id,
+          message: `Yangi ${payload.loanId} raqamli kredit monitoring uchun berildi`,
+          loanId: payload.loanId,
+        },
+      })
+    }
   }
 
   async approveLoan(loanId: string, userId: string) {
@@ -112,6 +145,100 @@ export class LoanService {
       throw new NotFoundException('User not found')
     }
 
+    const assignedAdmin = await this.prisma.admin.findFirst({
+      where: {
+        loanHistory: {
+          some: {
+            loanId: loanId,
+          },
+        },
+      },
+    })
+
+    const checkerEmp = await this.prisma.admin.findFirst({
+      where: {
+        bhmCode: loan.bhmCode,
+        region: loan.codeRegion,
+        role: Role.REGION_CHECKER_EMPLOYEE,
+      },
+    })
+
+    const checkerBoss = await this.prisma.admin.findFirst({
+      where: {
+        region: loan.codeRegion,
+        role: Role.REGION_CHECKER_BOSS,
+      },
+    })
+
+    const regionBoss = await this.prisma.admin.findFirst({
+      where: {
+        region: loan.codeRegion,
+        role: Role.REGION_BOSS,
+      },
+    })
+
+    switch (user.role) {
+      case Role.REGION_CHECKER_BOSS:
+        if (checkerEmp) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: checkerEmp.id,
+              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan tasdiqlandi`,
+              loanId,
+            },
+          })
+        }
+
+        if (regionBoss) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: regionBoss.id,
+              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan tasdiqlandi`,
+              loanId,
+            },
+          })
+        }
+        if (assignedAdmin) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: assignedAdmin.id,
+              message: `Sizning ${loanId} raqamli kreditingiz tasdiqlandi`,
+              loanId,
+            },
+          })
+        }
+        break
+      case Role.REGION_CHECKER_EMPLOYEE:
+        if (checkerBoss) {
+          await this.prisma.loanHistory.create({
+            data: {
+              assigneeId: checkerBoss.id,
+              loanId,
+              status: LoanStatus.PENDING,
+            },
+          })
+
+          await this.prisma.notification.create({
+            data: {
+              adminId: checkerBoss.id,
+              message: `Yangi ${loanId} raqamli kredit monitoring uchun berildi`,
+              loanId,
+            },
+          })
+        }
+
+        if (assignedAdmin) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: assignedAdmin.id,
+              message: `Sizning ${loanId} raqamli kreditingiz tasdiqlandi`,
+              loanId,
+            },
+          })
+        }
+        break
+    }
+
     await this.prisma.loanHistory.create({
       data: {
         assigneeId: userId,
@@ -119,16 +246,6 @@ export class LoanService {
         status: LoanStatus.APPROVED,
       },
     })
-
-    await this.prisma.notification.create({
-      data: {
-        adminId: userId,
-        message: `Sizning ${loanId} raqamli kreditingiz tasdiqlandi`,
-        loanId,
-      },
-    })
-
-    // create notifications for monitoring boshliq
   }
 
   async rejectLoan(loanId: string, userId: string) {
@@ -158,6 +275,85 @@ export class LoanService {
       throw new NotFoundException('User not found')
     }
 
+    const assignedAdmin = await this.prisma.admin.findFirst({
+      where: {
+        loanHistory: {
+          some: {
+            loanId: loanId,
+          },
+        },
+      },
+    })
+
+    const checkerEmp = await this.prisma.admin.findFirst({
+      where: {
+        bhmCode: loan.bhmCode,
+        region: loan.codeRegion,
+        role: Role.REGION_CHECKER_EMPLOYEE,
+      },
+    })
+
+    const regionBoss = await this.prisma.admin.findFirst({
+      where: {
+        region: loan.codeRegion,
+        role: Role.REGION_BOSS,
+      },
+    })
+
+    switch (user.role) {
+      case Role.REGION_CHECKER_BOSS:
+        if (checkerEmp) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: checkerEmp.id,
+              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan rad etildi`,
+              loanId,
+            },
+          })
+        }
+
+        if (regionBoss) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: regionBoss.id,
+              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan rad etildi`,
+              loanId,
+            },
+          })
+        }
+        if (assignedAdmin) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: assignedAdmin.id,
+              message: `Sizning ${loanId} raqamli kreditingiz rad etildi`,
+              loanId,
+            },
+          })
+        }
+        break
+      case Role.REGION_CHECKER_EMPLOYEE:
+        if (regionBoss) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: regionBoss.id,
+              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan rad etildi`,
+              loanId,
+            },
+          })
+        }
+
+        if (assignedAdmin) {
+          await this.prisma.notification.create({
+            data: {
+              adminId: assignedAdmin.id,
+              message: `Sizning ${loanId} raqamli kreditingiz rad etildi`,
+              loanId,
+            },
+          })
+        }
+        break
+    }
+
     await this.prisma.loanHistory.create({
       data: {
         assigneeId: userId,
@@ -166,15 +362,21 @@ export class LoanService {
       },
     })
 
+    await this.prisma.loanHistory.create({
+      data: {
+        assigneeId: assignedAdmin.id,
+        loanId,
+        status: LoanStatus.PENDING,
+      },
+    })
+
     await this.prisma.notification.create({
       data: {
-        adminId: userId,
+        adminId: assignedAdmin.id,
         message: `Sizning ${loanId} raqamli kreditingiz rad etildi`,
         loanId,
       },
     })
-
-    // create notifications for monitoring boshliq
   }
 
   async getLoan(id: string): Promise<GetLoanResponse> {
