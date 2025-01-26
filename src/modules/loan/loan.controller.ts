@@ -277,7 +277,6 @@ export class LoanController {
     description: HttpMessage.INTERNAL_SERVER_ERROR,
   })
   async getLoans(@Req() { userId }: { userId: string }): Promise<GetLoansDto[]> {
-    console.log(userId)
     return this.#_service.getLoans(userId)
   }
 

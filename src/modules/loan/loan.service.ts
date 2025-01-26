@@ -556,7 +556,6 @@ export class LoanService {
   }
 
   async #_getLoansForRegionBoss(regionCode: string) {
-    console.log(regionCode)
     return this.prisma.loan.findMany({
       where: {
         codeRegion: String(Number(regionCode)) as unknown as string,

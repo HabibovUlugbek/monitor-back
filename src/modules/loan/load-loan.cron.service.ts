@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
 import { LoanStatus, Role } from '@prisma/client'
 import { PrismaService } from 'modules/prisma'
-import { mockData } from './mock-loan'
 import { Client } from 'pg'
 
 @Injectable()
@@ -70,7 +69,6 @@ export class LoadLoanService {
         return
       }
 
-      console.log(regionBoss)
       const { id: loanId } = await this.prisma.loan.create({
         data: {
           codeRegion: String(loan.code_region),
