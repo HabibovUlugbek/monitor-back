@@ -34,6 +34,7 @@ model Admin {
   notifications Notification[]
   loanHistory   LoanHistory[]
   messages      Message[]
+  files File[]
 
   @@index([region], name: "region_index")
 
@@ -58,6 +59,7 @@ model Loan {
   history    LoanHistory[]
   notifications Notification[]
   messages      Message[]
+  files File[]
   @@map("loans")
 }
 
@@ -107,4 +109,17 @@ model Message {
   adminId   String
 
   @@map("messages")
+}
+
+model File {
+  id        String   @id @default(dbgenerated("gen_random_uuid()"))
+  name      String
+  pages     String
+  path      String
+  admin     Admin    @relation(fields: [adminId], references: [id])
+  adminId   String
+
+  loan     Loan     @relation(fields: [loanId], references: [id])
+  loanId   String
+  @@map("file")
 }

@@ -1,4 +1,16 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Req, Res, UploadedFile, UseInterceptors } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common'
 import { ApiBody, ApiHeaders, ApiResponse, ApiTags } from '@nestjs/swagger'
 import {
   ConflictDto,
@@ -10,12 +22,9 @@ import {
 } from '@exceptions'
 import { FileInterceptor } from '@nestjs/platform-express'
 import { diskStorage } from 'multer'
-import { createReadStream } from 'fs'
-import { join } from 'path'
 import { LoanService } from './loan.service'
 import { VerifyAdminInterceptor, VerifyRolesInterceptor } from '@interceptors'
 import { AssignLoanRequestDto, GetLoanResponseDto, GetLoansDto, LoanStatsDto, SendMessageRequestDto } from './dtos'
-import { Response } from 'express'
 
 @ApiTags('Loan Service')
 @Controller({
@@ -186,7 +195,7 @@ export class LoanController {
       storage: diskStorage({
         destination: './uploads', // Save to `uploads` folder
         filename: (req, file, cb) => {
-          const fileName = `${Date.now()}-${file.originalname}`
+          const fileName = `${file.originalname}`
           cb(null, fileName) // Generate a unique file name
         },
       }),
@@ -195,10 +204,51 @@ export class LoanController {
   uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Param('loanId') loanId: string,
+    @Query() query: { name?: string; pages?: string },
     @Req() { userId }: { userId: string },
   ) {
     const filePath = `/files/${file?.filename}`
-    this.#_service.uploadInfo(loanId, filePath, userId)
+    this.#_service.uploadInfo(loanId, filePath, userId, query)
+  }
+
+  @Get(':id/files')
+  @UseInterceptors(VerifyAdminInterceptor)
+  @HttpCode(HttpStatus.OK)
+  @ApiHeaders([
+    {
+      name: 'Authorization',
+      description: 'Authorization token',
+      required: true,
+    },
+  ])
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: HttpMessage.OK,
+    type: String,
+    isArray: true,
+  })
+  @ApiResponse({
+    type: ForbiddenDto,
+    status: HttpStatus.FORBIDDEN,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiResponse({
+    type: ConflictDto,
+    status: HttpStatus.CONFLICT,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiResponse({
+    type: UnprocessableEntityDto,
+    status: HttpStatus.UNPROCESSABLE_ENTITY,
+    description: HttpMessage.UNPROCESSABLE_ENTITY,
+  })
+  @ApiResponse({
+    type: InternalServerErrorDto,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  async getLoanFiles(@Param('id') id: string): Promise<any> {
+    return this.#_service.getLoanFiles(id)
   }
 
   @Post('stats')

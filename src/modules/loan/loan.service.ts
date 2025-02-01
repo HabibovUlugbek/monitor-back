@@ -476,7 +476,7 @@ export class LoanService {
     return statistics
   }
 
-  async uploadInfo(loanId: string, filePath: string, userId: string) {
+  async uploadInfo(loanId: string, filePath: string, userId: string, data: { name?: string; pages?: string }) {
     await this.prisma.loanHistory.updateMany({
       where: {
         loanId: loanId,
@@ -516,6 +516,28 @@ export class LoanService {
         adminId: userId,
         message: `File uploaded: http://localhost:4000${filePath}`,
         loanId: loanId,
+      },
+    })
+
+    await this.prisma.file.create({
+      data: {
+        name: data.name,
+        pages: data.name,
+        adminId: userId,
+        loanId,
+        path: ` http://localhost:4000${filePath}`,
+      },
+    })
+  }
+
+  async getLoanFiles(loanId: string) {
+    return this.prisma.file.findMany({
+      where: {
+        loanId,
+      },
+      include: {
+        admin: true,
+        loan: true,
       },
     })
   }
@@ -558,7 +580,7 @@ export class LoanService {
   async #_getLoansForRegionBoss(regionCode: string) {
     return this.prisma.loan.findMany({
       where: {
-        codeRegion: String(Number(regionCode)) as unknown as string,
+        codeRegion: regionCode,
       },
       orderBy: {
         createdAt: 'desc',
