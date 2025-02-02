@@ -551,16 +551,18 @@ export class LoanService {
       },
     })
 
-    await this.prisma.file.create({
-      data: {
-        name: data.name,
-        pages: data.pages,
-        adminId: userId,
-        loanId,
-        path: ` http://localhost:4000${filePath}`,
-        comment: data.comment,
-      },
-    })
+    if (data && data?.pages && data.comment) {
+      await this.prisma.file.create({
+        data: {
+          name: data.name,
+          pages: data.pages,
+          adminId: userId,
+          loanId,
+          path: ` http://localhost:4000${filePath}`,
+          comment: data.comment,
+        },
+      })
+    }
   }
 
   async getLoanFiles(loanId: string) {
