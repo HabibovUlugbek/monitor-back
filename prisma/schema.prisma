@@ -116,6 +116,7 @@ model File {
   name      String
   pages     String
   path      String
+  comment   String
   admin     Admin    @relation(fields: [adminId], references: [id])
   adminId   String
 

@@ -24,7 +24,7 @@ export class LoadLoanService {
     await this.client.end()
   }
 
-  @Cron(CronExpression.EVERY_10_HOURS)
+  @Cron(CronExpression.EVERY_WEEKDAY)
   async loadLoan() {
     Logger.log('Loading loan data...', 'LoanCron')
 
@@ -67,15 +67,13 @@ export class LoadLoanService {
       const regionBoss = regionBosses.find((reg) => Number(reg.region) === Number(loan.code_region))
 
       if (!regionBoss) {
-        // Logger.error(`Region boss not found for region ${loan.codeRegion}`)
+        Logger.error(`Region boss not found for region ${loan.codeRegion}`)
         return
       }
 
       const existingLoan = await this.prisma.loan.findFirst({
         where: { externalId: loan.loan_id },
       })
-
-      console.log(loan)
 
       if (existingLoan) return
 

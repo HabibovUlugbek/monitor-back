@@ -25,6 +25,7 @@ import { diskStorage } from 'multer'
 import { LoanService } from './loan.service'
 import { VerifyAdminInterceptor, VerifyRolesInterceptor } from '@interceptors'
 import { AssignLoanRequestDto, GetLoanResponseDto, GetLoansDto, LoanStatsDto, SendMessageRequestDto } from './dtos'
+import { Response } from 'express'
 
 @ApiTags('Loan Service')
 @Controller({
@@ -204,7 +205,7 @@ export class LoanController {
   uploadFile(
     @UploadedFile() file: Express.Multer.File,
     @Param('loanId') loanId: string,
-    @Query() query: { name?: string; pages?: string },
+    @Query() query: { name: string; pages: string; comment: string },
     @Req() { userId }: { userId: string },
   ) {
     const filePath = `/files/${file?.filename}`
@@ -249,6 +250,11 @@ export class LoanController {
   })
   async getLoanFiles(@Param('id') id: string): Promise<any> {
     return this.#_service.getLoanFiles(id)
+  }
+
+  @Get(':id/download')
+  async getPdf(@Param('id') id: string, @Res() res: Response) {
+    const pdfBuffer = await this.#_service.genereatePDF(id)
   }
 
   @Post('stats')

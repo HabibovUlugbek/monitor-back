@@ -89,7 +89,7 @@ export class AdminService {
     })
   }
 
-  async getAdmins(userId: string): Promise<AdminResponseDto[]> {
+  async getAdmins(userId: string, bhmCode?: string): Promise<AdminResponseDto[]> {
     const admin = await this.prisma.admin.findUnique({
       where: { id: userId },
     })
@@ -111,8 +111,13 @@ export class AdminService {
       })
       admins.push(...result)
     } else if (admin.role === Role.REGION_BOSS) {
+      console.log(bhmCode)
       const result = await this.prisma.admin.findMany({
-        where: { id: { not: userId }, region: admin.region, role: Role.REGION_EMPLOYEE },
+        where: {
+          id: { not: userId },
+          region: admin.region,
+          role: Role.REGION_EMPLOYEE,
+        },
       })
       admins.push(...result)
     } else if (admin.role === Role.REGION_CHECKER_BOSS) {
@@ -129,6 +134,7 @@ export class AdminService {
         username: admin.username,
         role: admin.role,
         region: admin.region,
+        bhmCode: admin.bhmCode,
       }
     })
   }

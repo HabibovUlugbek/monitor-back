@@ -4,6 +4,7 @@ import { LoanStatus, Role } from '@prisma/client'
 import { NotFoundException } from '@exceptions'
 import { AssignLoanRequest, GetLoanResponse, Loan, LoanStats } from './interfaces'
 import { SendMessageRequestDto } from './dtos'
+import { generatePdf } from '@helpers'
 
 @Injectable()
 export class LoanService {
@@ -208,6 +209,26 @@ export class LoanService {
           })
         }
         break
+
+      case Role.REGION_EMPLOYEE:
+        if (checkerEmp) {
+          await this.prisma.loanHistory.create({
+            data: {
+              assigneeId: checkerEmp.id,
+              loanId,
+              status: LoanStatus.PENDING,
+            },
+          })
+
+          await this.prisma.notification.create({
+            data: {
+              adminId: checkerEmp.id,
+              message: `Yangi ${loanId} raqamli kredit tekshiruv uchun berildi`,
+              loanId,
+            },
+          })
+        }
+        break
       case Role.REGION_CHECKER_EMPLOYEE:
         if (checkerBoss) {
           await this.prisma.loanHistory.create({
@@ -239,10 +260,13 @@ export class LoanService {
         break
     }
 
-    await this.prisma.loanHistory.create({
-      data: {
+    await this.prisma.loanHistory.updateMany({
+      where: {
         assigneeId: userId,
         loanId,
+        status: LoanStatus.PENDING,
+      },
+      data: {
         status: LoanStatus.APPROVED,
       },
     })
@@ -354,11 +378,14 @@ export class LoanService {
         break
     }
 
-    await this.prisma.loanHistory.create({
-      data: {
+    await this.prisma.loanHistory.updateMany({
+      where: {
         assigneeId: userId,
         loanId,
-        status: LoanStatus.REJECTED,
+        status: LoanStatus.PENDING,
+      },
+      data: {
+        status: LoanStatus.APPROVED,
       },
     })
 
@@ -476,40 +503,45 @@ export class LoanService {
     return statistics
   }
 
-  async uploadInfo(loanId: string, filePath: string, userId: string, data: { name?: string; pages?: string }) {
-    await this.prisma.loanHistory.updateMany({
-      where: {
-        loanId: loanId,
-        assigneeId: userId,
-        status: LoanStatus.PENDING,
-      },
-      data: {
-        status: LoanStatus.APPROVED,
-      },
-    })
+  async uploadInfo(
+    loanId: string,
+    filePath: string,
+    userId: string,
+    data?: { name: string; pages: string; comment: string },
+  ) {
+    // await this.prisma.loanHistory.updateMany({
+    //   where: {
+    //     loanId: loanId,
+    //     assigneeId: userId,
+    //     status: LoanStatus.PENDING,
+    //   },
+    //   data: {
+    //     status: LoanStatus.APPROVED,
+    //   },
+    // })
 
-    const loan = await this.prisma.loan.findFirst({
-      where: {
-        id: loanId,
-      },
-    })
+    // const loan = await this.prisma.loan.findFirst({
+    //   where: {
+    //     id: loanId,
+    //   },
+    // })
 
-    const regionChecker = await this.prisma.admin.findFirst({
-      where: {
-        role: Role.REGION_CHECKER_EMPLOYEE,
-        region: loan?.bhmCode,
-      },
-    })
+    // const regionChecker = await this.prisma.admin.findFirst({
+    //   where: {
+    //     role: Role.REGION_CHECKER_EMPLOYEE,
+    //     region: loan?.bhmCode,
+    //   },
+    // })
 
-    if (regionChecker) {
-      await this.prisma.notification.create({
-        data: {
-          adminId: regionChecker.id,
-          message: `${loanId} raqamli kredit tekshirish uchun berildi`,
-          loanId: loanId,
-        },
-      })
-    }
+    // if (regionChecker) {
+    //   await this.prisma.notification.create({
+    //     data: {
+    //       adminId: regionChecker.id,
+    //       message: `${loanId} raqamli kredit tekshirish uchun berildi`,
+    //       loanId: loanId,
+    //     },
+    //   })
+    // }
 
     await this.prisma.message.create({
       data: {
@@ -522,10 +554,11 @@ export class LoanService {
     await this.prisma.file.create({
       data: {
         name: data.name,
-        pages: data.name,
+        pages: data.pages,
         adminId: userId,
         loanId,
         path: ` http://localhost:4000${filePath}`,
+        comment: data.comment,
       },
     })
   }
@@ -552,6 +585,20 @@ export class LoanService {
     })
   }
 
+  async genereatePDF(loanId: string): Promise<Buffer> {
+    console.log('here')
+    const data = await this.prisma.file.findMany({
+      where: {
+        loanId,
+      },
+      include: {
+        admin: true,
+        loan: true,
+      },
+    })
+
+    return generatePdf(loanId, data)
+  }
   async #_getLoansForRegionEmployee(userId: string): Promise<Loan[]> {
     return this.prisma.loan.findMany({
       where: {
