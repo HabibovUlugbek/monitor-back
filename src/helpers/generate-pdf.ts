@@ -5,7 +5,8 @@ import path from 'path'
 export const generatePdf = async (loanId: string, data: any): Promise<Buffer> => {
   try {
     // Load custom font
-    const fontPath = path.resolve(__dirname, './OpenSans-Regular.ttf')
+    const fontPath = path.resolve(__dirname, '../../fonts/OpenSans-Regular.ttf')
+    console.log(fontPath)
     const fontBuffer = await fs.readFile(fontPath)
     const fontBytes = new Uint8Array(fontBuffer)
 
@@ -127,7 +128,7 @@ export const generatePdf = async (loanId: string, data: any): Promise<Buffer> =>
 }
 ;(async () => {
   try {
-    // const pdfBuffer = await generatePdf({})
+    const pdfBuffer = await generatePdf('123', [])
     console.log('✅ PDF Generated Successfully!')
   } catch (error) {
     console.error('❌ Error generating PDF:', error)
