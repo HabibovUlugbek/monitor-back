@@ -509,44 +509,10 @@ export class LoanService {
     userId: string,
     data?: { name: string; pages: string; comment: string },
   ) {
-    // await this.prisma.loanHistory.updateMany({
-    //   where: {
-    //     loanId: loanId,
-    //     assigneeId: userId,
-    //     status: LoanStatus.PENDING,
-    //   },
-    //   data: {
-    //     status: LoanStatus.APPROVED,
-    //   },
-    // })
-
-    // const loan = await this.prisma.loan.findFirst({
-    //   where: {
-    //     id: loanId,
-    //   },
-    // })
-
-    // const regionChecker = await this.prisma.admin.findFirst({
-    //   where: {
-    //     role: Role.REGION_CHECKER_EMPLOYEE,
-    //     region: loan?.bhmCode,
-    //   },
-    // })
-
-    // if (regionChecker) {
-    //   await this.prisma.notification.create({
-    //     data: {
-    //       adminId: regionChecker.id,
-    //       message: `${loanId} raqamli kredit tekshirish uchun berildi`,
-    //       loanId: loanId,
-    //     },
-    //   })
-    // }
-
     await this.prisma.message.create({
       data: {
         adminId: userId,
-        message: `File uploaded: http://localhost:4000${filePath}`,
+        message: `File uploaded: ${filePath}`,
         loanId: loanId,
       },
     })
@@ -558,7 +524,7 @@ export class LoanService {
           pages: data.pages,
           adminId: userId,
           loanId,
-          path: ` http://localhost:4000${filePath}`,
+          path: `${filePath}`,
           comment: data.comment,
         },
       })

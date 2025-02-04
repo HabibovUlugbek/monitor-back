@@ -15,7 +15,7 @@ setImmediate(async (): Promise<void> => {
   const app = await NestFactory.create<NestExpressApplication>(App, new ExpressAdapter(), {
     cors: {
       maxAge: 0,
-      origin: ['http://localhost:3000'],
+      origin: ['http://localhost:3000', 'http://192.168.1.132:3000'],
       methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization'],
