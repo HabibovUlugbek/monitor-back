@@ -78,7 +78,7 @@ export class LoanService {
     await this.prisma.notification.create({
       data: {
         adminId: payload.userId,
-        message: `Sizga yangi ${payload.loanId} raqamli kredit berildi`,
+        message: `Sizga yangi ${loan.externalId} raqamli kredit berildi`,
         loanId: payload.loanId,
       },
     })
@@ -95,7 +95,7 @@ export class LoanService {
       await this.prisma.notification.create({
         data: {
           adminId: checkerEmp.id,
-          message: `Yangi ${payload.loanId} raqamli kredit monitoring uchun berildi`,
+          message: `Yangi ${loan.externalId} raqamli kredit monitoring uchun berildi`,
           loanId: payload.loanId,
         },
       })
@@ -112,7 +112,7 @@ export class LoanService {
       await this.prisma.notification.create({
         data: {
           adminId: checkerBoss.id,
-          message: `Yangi ${payload.loanId} raqamli kredit monitoring uchun berildi`,
+          message: `Yangi ${loan.externalId} raqamli kredit monitoring uchun berildi`,
           loanId: payload.loanId,
         },
       })
@@ -184,7 +184,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: checkerEmp.id,
-              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan tasdiqlandi`,
+              message: `Yangi ${loan.externalId} raqamli kredit monitoring tomonidan tasdiqlandi`,
               loanId,
             },
           })
@@ -194,7 +194,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: regionBoss.id,
-              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan tasdiqlandi`,
+              message: `Yangi ${loan.externalId} raqamli kredit monitoring tomonidan tasdiqlandi`,
               loanId,
             },
           })
@@ -203,7 +203,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: assignedAdmin.id,
-              message: `Sizning ${loanId} raqamli kreditingiz tasdiqlandi`,
+              message: `Sizning ${loan.externalId} raqamli kreditingiz tasdiqlandi`,
               loanId,
             },
           })
@@ -223,7 +223,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: checkerEmp.id,
-              message: `Yangi ${loanId} raqamli kredit tekshiruv uchun berildi`,
+              message: `Yangi ${loan.externalId} raqamli kredit tekshiruv uchun berildi`,
               loanId,
             },
           })
@@ -242,7 +242,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: checkerBoss.id,
-              message: `Yangi ${loanId} raqamli kredit monitoring uchun berildi`,
+              message: `Yangi ${loan.externalId} raqamli kredit monitoring uchun berildi`,
               loanId,
             },
           })
@@ -252,7 +252,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: assignedAdmin.id,
-              message: `Sizning ${loanId} raqamli kreditingiz tasdiqlandi`,
+              message: `Sizning ${loan.externalId} raqamli kreditingiz tasdiqlandi`,
               loanId,
             },
           })
@@ -330,7 +330,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: checkerEmp.id,
-              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan rad etildi`,
+              message: `Yangi ${loan.externalId} raqamli kredit monitoring tomonidan rad etildi`,
               loanId,
             },
           })
@@ -340,7 +340,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: regionBoss.id,
-              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan rad etildi`,
+              message: `Yangi ${loan.externalId} raqamli kredit monitoring tomonidan rad etildi`,
               loanId,
             },
           })
@@ -349,7 +349,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: assignedAdmin.id,
-              message: `Sizning ${loanId} raqamli kreditingiz rad etildi`,
+              message: `Sizning ${loan.externalId} raqamli kreditingiz rad etildi`,
               loanId,
             },
           })
@@ -360,7 +360,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: regionBoss.id,
-              message: `Yangi ${loanId} raqamli kredit monitoring tomonidan rad etildi`,
+              message: `Yangi ${loan.externalId} raqamli kredit monitoring tomonidan rad etildi`,
               loanId,
             },
           })
@@ -370,7 +370,7 @@ export class LoanService {
           await this.prisma.notification.create({
             data: {
               adminId: assignedAdmin.id,
-              message: `Sizning ${loanId} raqamli kreditingiz rad etildi`,
+              message: `Sizning ${loan.externalId} raqamli kreditingiz rad etildi`,
               loanId,
             },
           })
@@ -385,7 +385,7 @@ export class LoanService {
         status: LoanStatus.PENDING,
       },
       data: {
-        status: LoanStatus.APPROVED,
+        status: LoanStatus.REJECTED,
       },
     })
 
@@ -400,7 +400,7 @@ export class LoanService {
     await this.prisma.notification.create({
       data: {
         adminId: assignedAdmin.id,
-        message: `Sizning ${loanId} raqamli kreditingiz rad etildi`,
+        message: `Sizning ${loan.externalId} raqamli kreditingiz rad etildi`,
         loanId,
       },
     })

@@ -59,7 +59,7 @@ export class CheckAssignService {
 
         await this.prisma.notification.create({
           data: {
-            message: `${loan.id} raqamli kredit bo'lib berilmadi`,
+            message: `${loan.externalId} raqamli kredit bo'lib berilmadi`,
             adminId: republicEmployee.id,
             loanId: loan.id,
           },

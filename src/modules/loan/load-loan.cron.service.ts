@@ -77,7 +77,7 @@ export class LoadLoanService {
 
       if (existingLoan) return
 
-      const { id: loanId } = await this.prisma.loan.create({
+      const { id: loanId, externalId } = await this.prisma.loan.create({
         data: {
           codeRegion: String(loan.code_region),
           bhmCode: String(loan.code_bxm),
@@ -97,12 +97,12 @@ export class LoadLoanService {
             },
           },
         },
-        select: { id: true },
+        select: { id: true, externalId: true },
       })
 
       await this.prisma.notification.create({
         data: {
-          message: `Sizga ${loanId} raqamli kredit bo'lib berish uchun berildi`,
+          message: `Sizga ${externalId} raqamli kredit bo'lib berish uchun berildi`,
           adminId: regionBoss.id,
           loanId,
         },
@@ -121,7 +121,7 @@ export class LoadLoanService {
 
       await this.prisma.notification.create({
         data: {
-          message: `Sizga ${loanId} raqamli kredit tekshirish uchun berildi`,
+          message: `Sizga ${externalId} raqamli kredit tekshirish uchun berildi`,
           adminId: checker.id,
           loanId,
         },
